@@ -17,6 +17,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.platform.LocalConfiguration
 import com.luckydut97.tennispark_tablet.ui.theme.*
 
 data class CheckInLocation(
@@ -33,6 +34,12 @@ fun CheckInCardPager() {
         CheckInLocation("서초 테니스장", "C코트")
     )
 
+    val configuration = LocalConfiguration.current
+    val screenWidth = configuration.screenWidthDp.dp
+    val cardWidth = 474.dp
+
+    val horizontalPadding = ((screenWidth - cardWidth) / 2).coerceAtLeast(0.dp)
+
     val pagerState = rememberPagerState(pageCount = { locations.size })
 
     HorizontalPager(
@@ -40,8 +47,8 @@ fun CheckInCardPager() {
         modifier = Modifier
             .fillMaxWidth()
             .wrapContentHeight(),
-        contentPadding = PaddingValues(horizontal = 40.dp),
-        pageSpacing = 16.dp
+        contentPadding = PaddingValues(horizontal = horizontalPadding),
+        pageSpacing = 70.dp
     ) { page ->
         CheckInCard(location = locations[page])
     }

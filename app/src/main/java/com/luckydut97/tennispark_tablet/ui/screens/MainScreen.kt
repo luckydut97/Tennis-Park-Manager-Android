@@ -63,7 +63,7 @@ fun MainScreen(
             // Check-in Card Pager
             Box(
                 modifier = Modifier.weight(1f),
-                contentAlignment = Alignment.Center
+                contentAlignment = Alignment.Center,
             ) {
                 CheckInCardPager()
             }
