@@ -44,80 +44,62 @@ fun SplashScreen(onSplashComplete: () -> Unit) {
 
 @Composable
 fun MainScreen(
-    onNavigateToActivity: () -> Unit = {},
-    onNavigateToEvent: () -> Unit = {}
+    selectedItem: String,
+    onNavigateToHome: () -> Unit,
+    onNavigateToActivity: () -> Unit,
+    onNavigateToEvent: () -> Unit,
+    onNavigateToSettings: () -> Unit
 ) {
-    Box(
+    Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(TennisGreen)
+            .background(TennisGreen),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // 메인 콘텐츠 영역
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally
+        // 상단 여백 및 체크인 카드
+        Spacer(modifier = Modifier.height(40.dp))
+        Box(
+            modifier = Modifier.weight(1f),
+            contentAlignment = Alignment.Center,
         ) {
-            // 상단 여백
-            Spacer(modifier = Modifier.height(40.dp))
-
-            // Check-in Card Pager
-            Box(
-                modifier = Modifier.weight(1f),
-                contentAlignment = Alignment.Center,
-            ) {
-                CheckInCardPager()
-            }
+            CheckInCardPager()
         }
 
-        // 하단 고정 요소들
-        Column(
+        // 하단 부분: 로고 + 결제 버튼
+        Image(
+            painter = painterResource(id = R.drawable.ic_typo_logo),
+            contentDescription = "Tennis Park Logo",
             modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(bottom = 60.dp), // 갤럭시 탭 기본 메뉴바 여백
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(24.dp)
+                .width(474.dp)
+                .height(43.28.dp),
+            contentScale = ContentScale.Fit
+        )
+        Spacer(modifier = Modifier.height(24.dp))
+        Button(
+            onClick = { /* Handle payment */ },
+            modifier = Modifier
+                .width(474.dp)
+                .height(59.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color(0xFFFFFF57),
+                contentColor = TennisGreen
+            ),
+            shape = RoundedCornerShape(30.dp)
         ) {
-            // Tennis Park Logo
-            Image(
-                painter = painterResource(id = R.drawable.ic_typo_logo),
-                contentDescription = "Tennis Park Logo",
-                modifier = Modifier
-                    .width(474.dp)
-                    .height(43.28.dp),
-                contentScale = ContentScale.Fit
+            Text(
+                text = "상품 결제",
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold
             )
-
-            // Payment Button
-            Button(
-                onClick = { /* Handle payment */ },
-                modifier = Modifier
-                    .width(474.dp)
-                    .height(59.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFFFFFF57),
-                    contentColor = TennisGreen
-                ),
-                shape = RoundedCornerShape(30.dp)
-            ) {
-                Text(
-                    text = "상품 결제",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-
-            // 하단 네비게이션과의 간격
-            Spacer(modifier = Modifier.height(20.dp))
         }
-
-        // 하단 네비게이션
+        Spacer(modifier = Modifier.height(20.dp))
+        // 하단 네비게이션 (네비게이션바 여백 자동 padding)
         BottomNavigationBar(
-            selectedItem = "홈",
-            onNavigateToHome = { },
+            selectedItem = selectedItem,
+            onNavigateToHome = onNavigateToHome,
             onNavigateToActivity = onNavigateToActivity,
             onNavigateToEvent = onNavigateToEvent,
-            onNavigateToSettings = { },
-            modifier = Modifier.align(Alignment.BottomCenter)
+            onNavigateToSettings = onNavigateToSettings
         )
     }
 }
@@ -126,7 +108,13 @@ fun MainScreen(
 @Composable
 fun TabletMainScreenPreview() {
     Tennispark_tabletTheme {
-        MainScreen()
+        MainScreen(
+            selectedItem = "홈",
+            onNavigateToHome = {},
+            onNavigateToActivity = {},
+            onNavigateToEvent = {},
+            onNavigateToSettings = {}
+        )
     }
 }
 

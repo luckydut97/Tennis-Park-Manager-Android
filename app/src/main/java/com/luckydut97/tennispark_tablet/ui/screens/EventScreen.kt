@@ -21,10 +21,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.tooling.preview.Preview
+import com.luckydut97.tennispark_tablet.ui.components.BottomNavigationBar
 import com.luckydut97.tennispark_tablet.ui.theme.*
 
 data class TabletBannerSlot(
@@ -41,7 +42,11 @@ data class TabletEventItem(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TabletEventScreen(
-    onNavigateBack: () -> Unit = {}
+    selectedItem: String,
+    onNavigateToHome: () -> Unit,
+    onNavigateToActivity: () -> Unit,
+    onNavigateToEvent: () -> Unit,
+    onNavigateToSettings: () -> Unit
 ) {
     var showEventDialog by remember { mutableStateOf(false) }
 
@@ -66,10 +71,6 @@ fun TabletEventScreen(
             .fillMaxSize()
             .background(TennisGreen)
     ) {
-        // Status Bar Area
-        StatusBarArea()
-
-        // Top Bar
         TopAppBar(
             title = {
                 Text(
@@ -81,7 +82,7 @@ fun TabletEventScreen(
             },
             navigationIcon = {
                 IconButton(
-                    onClick = onNavigateBack,
+                    onClick = onNavigateToHome,
                     modifier = Modifier.size(48.dp)
                 ) {
                     Icon(
@@ -182,8 +183,11 @@ fun TabletEventScreen(
 
         // Bottom Navigation
         BottomNavigationBar(
-            selectedItem = "이벤트 관리",
-            onNavigateBack = onNavigateBack
+            selectedItem = selectedItem,
+            onNavigateToHome = onNavigateToHome,
+            onNavigateToActivity = onNavigateToActivity,
+            onNavigateToEvent = onNavigateToEvent,
+            onNavigateToSettings = onNavigateToSettings
         )
     }
 
@@ -535,86 +539,16 @@ private fun TabletEventCreationDialog(
     }
 }
 
-@Composable
-private fun BottomNavigationBar(
-    selectedItem: String,
-    onNavigateBack: () -> Unit
-) {
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-        color = TennisGreen,
-        shadowElevation = 8.dp
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 20.dp),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            BottomNavItem(
-                icon = Icons.Default.Home,
-                text = "홈",
-                selected = selectedItem == "홈",
-                onClick = onNavigateBack
-            )
-            BottomNavItem(
-                icon = Icons.Default.DirectionsRun,
-                text = "활동관리",
-                selected = selectedItem == "활동관리",
-                onClick = { }
-            )
-            BottomNavItem(
-                icon = Icons.Default.EventNote,
-                text = "이벤트 관리",
-                selected = selectedItem == "이벤트 관리",
-                onClick = { }
-            )
-            BottomNavItem(
-                icon = Icons.Default.Settings,
-                text = "설정",
-                selected = selectedItem == "설정",
-                onClick = { }
-            )
-        }
-    }
-}
-
-@Composable
-private fun BottomNavItem(
-    icon: ImageVector,
-    text: String,
-    selected: Boolean,
-    onClick: () -> Unit
-) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.width(120.dp)
-    ) {
-        IconButton(
-            onClick = onClick,
-            modifier = Modifier.size(40.dp)
-        ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = text,
-                tint = if (selected) BottomNavSelected else BottomNavUnselected,
-                modifier = Modifier.size(28.dp)
-            )
-        }
-        Text(
-            text = text,
-            fontSize = 14.sp,
-            color = if (selected) BottomNavSelected else BottomNavUnselected,
-            fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal,
-            textAlign = TextAlign.Center
-        )
-    }
-}
-
 @Preview(showBackground = true, widthDp = 1600, heightDp = 2560)
 @Composable
 fun TabletEventScreenPreview() {
     Tennispark_tabletTheme {
-        TabletEventScreen()
+        TabletEventScreen(
+            selectedItem = "이벤트 관리",
+            onNavigateToHome = {},
+            onNavigateToActivity = {},
+            onNavigateToEvent = {},
+            onNavigateToSettings = {}
+        )
     }
 }

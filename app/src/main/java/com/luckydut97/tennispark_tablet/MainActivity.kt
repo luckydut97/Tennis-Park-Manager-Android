@@ -32,14 +32,25 @@ fun TennisParkTabletApp() {
             onSplashComplete = { currentScreen = "main" }
         )
         "main" -> MainScreen(
+            selectedItem = "홈",
+            onNavigateToHome = { /* already on home */ },
             onNavigateToActivity = { currentScreen = "activity" },
-            onNavigateToEvent = { currentScreen = "event" }
+            onNavigateToEvent = { currentScreen = "event" },
+            onNavigateToSettings = { /* put settings here */ }
         )
         "activity" -> TabletActivityScreen(
-            onNavigateBack = { currentScreen = "main" }
+            selectedItem = "활동관리",
+            onNavigateToHome = { currentScreen = "main" },
+            onNavigateToActivity = { /* already on activity */ },
+            onNavigateToEvent = { currentScreen = "event" },
+            onNavigateToSettings = { /* put settings here */ }
         )
         "event" -> TabletEventScreen(
-            onNavigateBack = { currentScreen = "main" }
+            selectedItem = "이벤트 관리",
+            onNavigateToHome = { currentScreen = "main" },
+            onNavigateToActivity = { currentScreen = "activity" },
+            onNavigateToEvent = { /* already on event */ },
+            onNavigateToSettings = { /* put settings here */ }
         )
     }
 }

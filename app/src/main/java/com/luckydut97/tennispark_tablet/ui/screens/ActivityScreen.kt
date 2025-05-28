@@ -29,6 +29,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.luckydut97.tennispark_tablet.ui.components.BottomNavigationBar
 import com.luckydut97.tennispark_tablet.ui.theme.*
 
 data class TabletActivity(
@@ -40,7 +41,11 @@ data class TabletActivity(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TabletActivityScreen(
-    onNavigateBack: () -> Unit = {}
+    selectedItem: String,
+    onNavigateToHome: () -> Unit,
+    onNavigateToActivity: () -> Unit,
+    onNavigateToEvent: () -> Unit,
+    onNavigateToSettings: () -> Unit
 ) {
     var currentTab by remember { mutableStateOf("활동 등록") }
 
@@ -57,9 +62,6 @@ fun TabletActivityScreen(
             .fillMaxSize()
             .background(TennisGreen)
     ) {
-        // Status Bar Area
-        StatusBarArea()
-
         // Top Bar
         TopAppBar(
             title = {
@@ -72,7 +74,7 @@ fun TabletActivityScreen(
             },
             navigationIcon = {
                 IconButton(
-                    onClick = onNavigateBack,
+                    onClick = onNavigateToHome,
                     modifier = Modifier.size(48.dp)
                 ) {
                     Icon(
@@ -125,8 +127,11 @@ fun TabletActivityScreen(
 
         // Bottom Navigation
         BottomNavigationBar(
-            selectedItem = "활동관리",
-            onNavigateBack = onNavigateBack
+            selectedItem = selectedItem,
+            onNavigateToHome = onNavigateToHome,
+            onNavigateToActivity = onNavigateToActivity,
+            onNavigateToEvent = onNavigateToEvent,
+            onNavigateToSettings = onNavigateToSettings
         )
     }
 }
@@ -528,86 +533,16 @@ private fun TabletRepeatButton(
     }
 }
 
-@Composable
-private fun BottomNavigationBar(
-    selectedItem: String,
-    onNavigateBack: () -> Unit
-) {
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-        color = TennisGreen,
-        shadowElevation = 8.dp
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 20.dp),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            BottomNavItem(
-                icon = Icons.Default.Home,
-                text = "홈",
-                selected = selectedItem == "홈",
-                onClick = onNavigateBack
-            )
-            BottomNavItem(
-                icon = Icons.Default.DirectionsRun,
-                text = "활동관리",
-                selected = selectedItem == "활동관리",
-                onClick = { }
-            )
-            BottomNavItem(
-                icon = Icons.Default.EventNote,
-                text = "이벤트 관리",
-                selected = selectedItem == "이벤트 관리",
-                onClick = { }
-            )
-            BottomNavItem(
-                icon = Icons.Default.Settings,
-                text = "설정",
-                selected = selectedItem == "설정",
-                onClick = { }
-            )
-        }
-    }
-}
-
-@Composable
-private fun BottomNavItem(
-    icon: ImageVector,
-    text: String,
-    selected: Boolean,
-    onClick: () -> Unit
-) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.width(120.dp)
-    ) {
-        IconButton(
-            onClick = onClick,
-            modifier = Modifier.size(40.dp)
-        ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = text,
-                tint = if (selected) BottomNavSelected else BottomNavUnselected,
-                modifier = Modifier.size(28.dp)
-            )
-        }
-        Text(
-            text = text,
-            fontSize = 14.sp,
-            color = if (selected) BottomNavSelected else BottomNavUnselected,
-            fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal,
-            textAlign = TextAlign.Center
-        )
-    }
-}
-
 @Preview(showBackground = true, widthDp = 1600, heightDp = 2560)
 @Composable
 fun TabletActivityScreenPreview() {
     Tennispark_tabletTheme {
-        TabletActivityScreen()
+        TabletActivityScreen(
+            selectedItem = "활동관리",
+            onNavigateToHome = {},
+            onNavigateToActivity = {},
+            onNavigateToEvent = {},
+            onNavigateToSettings = {}
+        )
     }
 }
