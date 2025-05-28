@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.tooling.preview.Preview
 import com.luckydut97.tennispark_tablet.ui.components.BottomNavigationBar
+import com.luckydut97.tennispark_tablet.ui.components.TabletTopBar
 import com.luckydut97.tennispark_tablet.ui.theme.*
 
 data class TabletBannerSlot(
@@ -71,33 +72,7 @@ fun TabletEventScreen(
             .fillMaxSize()
             .background(TennisGreen)
     ) {
-        TopAppBar(
-            title = {
-                Text(
-                    text = "이벤트 관리",
-                    color = White,
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            },
-            navigationIcon = {
-                IconButton(
-                    onClick = onNavigateToHome,
-                    modifier = Modifier.size(48.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.ArrowBack,
-                        contentDescription = "Back",
-                        tint = White,
-                        modifier = Modifier.size(32.dp)
-                    )
-                }
-            },
-            colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = TennisGreen
-            ),
-            modifier = Modifier.height(80.dp)
-        )
+        TabletTopBar(title = "이벤트 관리", onBack = onNavigateToHome)
 
         Column(
             modifier = Modifier

@@ -30,6 +30,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.luckydut97.tennispark_tablet.ui.components.BottomNavigationBar
+import com.luckydut97.tennispark_tablet.ui.components.TabletTopBar
 import com.luckydut97.tennispark_tablet.ui.theme.*
 
 data class TabletActivity(
@@ -62,34 +63,7 @@ fun TabletActivityScreen(
             .fillMaxSize()
             .background(TennisGreen)
     ) {
-        // Top Bar
-        TopAppBar(
-            title = {
-                Text(
-                    text = "활동 관리",
-                    color = White,
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            },
-            navigationIcon = {
-                IconButton(
-                    onClick = onNavigateToHome,
-                    modifier = Modifier.size(48.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.ArrowBack,
-                        contentDescription = "Back",
-                        tint = White,
-                        modifier = Modifier.size(32.dp)
-                    )
-                }
-            },
-            colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = TennisGreen
-            ),
-            modifier = Modifier.height(80.dp)
-        )
+        TabletTopBar(title = "활동 관리", onBack = onNavigateToHome)
 
         // Tab Row
         Row(
