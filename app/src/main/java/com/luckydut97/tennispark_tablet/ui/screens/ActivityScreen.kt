@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.sp
 import com.luckydut97.tennispark_tablet.ui.components.BottomNavigationBar
 import com.luckydut97.tennispark_tablet.ui.components.TabletTopBar
 import com.luckydut97.tennispark_tablet.ui.screens.ActivityRegistrationScreen
+import com.luckydut97.tennispark_tablet.ui.screens.ApplicationListScreen
 import com.luckydut97.tennispark_tablet.ui.theme.*
 
 data class TabletActivity(
@@ -53,6 +54,7 @@ fun TabletActivityScreen(
 ) {
     var currentTab by remember { mutableStateOf("활동 등록") }
     var showRegistrationScreen by remember { mutableStateOf(false) }
+    var showApplicationListScreen by remember { mutableStateOf(false) }
 
     val activities = remember {
         listOf(
@@ -70,6 +72,15 @@ fun TabletActivityScreen(
             onNavigateToEvent = onNavigateToEvent,
             onNavigateToSettings = onNavigateToSettings,
             onNavigateBack = { showRegistrationScreen = false }
+        )
+    } else if (showApplicationListScreen) {
+        ApplicationListScreen(
+            selectedItem = selectedItem,
+            onNavigateToHome = onNavigateToHome,
+            onNavigateToActivity = onNavigateToActivity,
+            onNavigateToEvent = onNavigateToEvent,
+            onNavigateToSettings = onNavigateToSettings,
+            onNavigateBack = { showApplicationListScreen = false }
         )
     } else {
         Column(
@@ -110,7 +121,9 @@ fun TabletActivityScreen(
                         showRegistrationScreen = true
                     }
                 } else {
-                    TabletApplicationContent()
+                    TabletApplicationContent {
+                        showApplicationListScreen = true
+                    }
                 }
             }
 
@@ -261,7 +274,7 @@ private fun TabletActivityCard(activity: TabletActivity) {
 }
 
 @Composable
-private fun TabletApplicationContent() {
+private fun TabletApplicationContent(onCardClick: () -> Unit) {
     val applicationActivities = remember {
         listOf(
             TabletActivity("수도공고 테니스장", "B코트", "10:00 - 12:00", 11, 12),
@@ -275,7 +288,10 @@ private fun TabletApplicationContent() {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         items(applicationActivities) { activity ->
-            TabletApplicationCard(activity = activity)
+            TabletApplicationCard(
+                activity = activity,
+                onClick = onCardClick
+            )
         }
         item {
             Spacer(modifier = Modifier.height(100.dp))
@@ -534,11 +550,12 @@ private fun TabletRepeatButton(
 }
 
 @Composable
-private fun TabletApplicationCard(activity: TabletActivity) {
+private fun TabletApplicationCard(activity: TabletActivity, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .width(755.dp)
-            .height(78.dp),
+            .height(78.dp)
+            .clickable { onClick() },
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = White),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
