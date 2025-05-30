@@ -4,6 +4,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -14,6 +16,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import com.luckydut97.tennispark_tablet.ui.components.BottomNavigationBar
 import com.luckydut97.tennispark_tablet.ui.components.TabletTopBar
 import com.luckydut97.tennispark_tablet.ui.theme.*
@@ -33,6 +36,8 @@ fun ActivityRegistrationScreen(
     var placeName by remember { mutableStateOf("") }
     var address by remember { mutableStateOf("") }
     var isRepeating by remember { mutableStateOf(true) }
+    var showStartTimePicker by remember { mutableStateOf(false) }
+    var showEndTimePicker by remember { mutableStateOf(false) }
 
     val weekDays = listOf("일", "월", "화", "수", "목", "금", "토")
 
@@ -83,7 +88,7 @@ fun ActivityRegistrationScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     OutlinedButton(
-                        onClick = { /* Handle start time selection */ },
+                        onClick = { showStartTimePicker = true },
                         modifier = Modifier.size(358.dp, 60.dp),
                         colors = ButtonDefaults.outlinedButtonColors(
                             containerColor = Color.White,
@@ -114,7 +119,7 @@ fun ActivityRegistrationScreen(
                     }
 
                     OutlinedButton(
-                        onClick = { /* Handle end time selection */ },
+                        onClick = { showEndTimePicker = true },
                         modifier = Modifier.size(358.dp, 60.dp),
                         colors = ButtonDefaults.outlinedButtonColors(
                             containerColor = Color.White,
@@ -334,6 +339,210 @@ fun ActivityRegistrationScreen(
             onNavigateToEvent = onNavigateToEvent,
             onNavigateToSettings = onNavigateToSettings
         )
+    }
+
+    // 시작 시간 선택 다이얼로그
+    if (showStartTimePicker) {
+        TimePickerDialog(
+            title = "시작 시간 선택",
+            onTimeSelected = { time ->
+                startTime = time
+                showStartTimePicker = false
+            },
+            onDismiss = { showStartTimePicker = false }
+        )
+    }
+
+    // 종료 시간 선택 다이얼로그
+    if (showEndTimePicker) {
+        TimePickerDialog(
+            title = "종료 시간 선택",
+            onTimeSelected = { time ->
+                endTime = time
+                showEndTimePicker = false
+            },
+            onDismiss = { showEndTimePicker = false }
+        )
+    }
+}
+
+@Composable
+private fun TimePickerDialog(
+    title: String,
+    onTimeSelected: (String) -> Unit,
+    onDismiss: () -> Unit
+) {
+    var selectedHour by remember { mutableStateOf(0) }
+    var selectedMinute by remember { mutableStateOf(0) }
+
+    val hours = (0..23).toList()
+    val minutes = listOf(0, 30)
+
+    Dialog(onDismissRequest = onDismiss) {
+        Card(
+            modifier = Modifier
+                .width(350.dp)
+                .height(400.dp),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = Color.White)
+        ) {
+            Column(
+                modifier = Modifier.padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = title,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black,
+                    modifier = Modifier.padding(bottom = 24.dp)
+                )
+
+                // Time Picker Row
+                Row(
+                    modifier = Modifier.height(200.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    // Hour Picker
+                    Column(
+                        modifier = Modifier.weight(1f),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = "시",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.Black,
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
+                        
+                        LazyColumn(
+                            modifier = Modifier.height(150.dp),
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            items(hours) { hour ->
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(40.dp)
+                                        .clickable { selectedHour = hour }
+                                        .background(
+                                            if (selectedHour == hour) Color(0xFF0D6042) else Color.Transparent,
+                                            RoundedCornerShape(8.dp)
+                                        ),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(
+                                        text = "%02d".format(hour),
+                                        fontSize = 18.sp,
+                                        fontWeight = if (selectedHour == hour) FontWeight.Bold else FontWeight.Normal,
+                                        color = if (selectedHour == hour) Color.White else Color.Black
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+                    // Separator
+                    Text(
+                        text = ":",
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Black,
+                        modifier = Modifier.padding(horizontal = 16.dp)
+                    )
+
+                    // Minute Picker
+                    Column(
+                        modifier = Modifier.weight(1f),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = "분",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.Black,
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
+                        
+                        LazyColumn(
+                            modifier = Modifier.height(150.dp),
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            items(minutes) { minute ->
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(40.dp)
+                                        .clickable { selectedMinute = minute }
+                                        .background(
+                                            if (selectedMinute == minute) Color(0xFF0D6042) else Color.Transparent,
+                                            RoundedCornerShape(8.dp)
+                                        ),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(
+                                        text = "%02d".format(minute),
+                                        fontSize = 18.sp,
+                                        fontWeight = if (selectedMinute == minute) FontWeight.Bold else FontWeight.Normal,
+                                        color = if (selectedMinute == minute) Color.White else Color.Black
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                // Buttons
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Button(
+                        onClick = onDismiss,
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(48.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color.Gray,
+                            contentColor = Color.White
+                        ),
+                        shape = RoundedCornerShape(8.dp)
+                    ) {
+                        Text(
+                            text = "취소",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+
+                    Button(
+                        onClick = {
+                            val timeString = "%02d:%02d".format(selectedHour, selectedMinute)
+                            onTimeSelected(timeString)
+                        },
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(48.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFF0D6042),
+                            contentColor = Color.White
+                        ),
+                        shape = RoundedCornerShape(8.dp)
+                    ) {
+                        Text(
+                            text = "확인",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
+            }
+        }
     }
 }
 

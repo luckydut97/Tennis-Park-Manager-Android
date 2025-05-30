@@ -24,7 +24,7 @@ fun TabletTopBar(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(80.dp)
+            .height(120.dp)
             .background(TennisGreen),
         contentAlignment = Alignment.Center
     ) {
