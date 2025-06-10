@@ -36,9 +36,12 @@ fun CheckInCardPager() {
 
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp.dp
-    val cardWidth = 474.dp
+    val screenHeight = configuration.screenHeightDp.dp
 
-    val horizontalPadding = ((screenWidth - cardWidth) / 2).coerceAtLeast(0.dp)
+    // 반응형 크기 계산
+    val cardWidth = (screenWidth * 0.55f).coerceAtMost(474.dp).coerceAtLeast(320.dp)
+    val cardHeight = (screenHeight * 0.52f).coerceAtMost(750.dp).coerceAtLeast(580.dp)
+    val horizontalPadding = ((screenWidth - cardWidth) / 2).coerceAtLeast(20.dp)
 
     val pagerState = rememberPagerState(pageCount = { locations.size })
 
@@ -48,20 +51,42 @@ fun CheckInCardPager() {
             .fillMaxWidth()
             .wrapContentHeight(),
         contentPadding = PaddingValues(horizontal = horizontalPadding),
-        pageSpacing = 70.dp
+        pageSpacing = (screenWidth * 0.05f).coerceAtLeast(20.dp).coerceAtMost(70.dp)
     ) { page ->
-        CheckInCard(location = locations[page])
+        CheckInCard(
+            location = locations[page],
+            cardWidth = cardWidth,
+            cardHeight = cardHeight
+        )
     }
 }
 
 @Composable
 fun CheckInCard(
-    location: CheckInLocation
+    location: CheckInLocation,
+    cardWidth: androidx.compose.ui.unit.Dp = 474.dp,
+    cardHeight: androidx.compose.ui.unit.Dp = 700.dp
 ) {
+    val configuration = LocalConfiguration.current
+    val screenWidth = configuration.screenWidthDp.dp
+
+    // 반응형 폰트 크기 계산 - 모든 폰트 크기 증가
+    val titleFontSize = (screenWidth.value * 0.025f).coerceAtLeast(28f).coerceAtMost(38f).sp
+    val descriptionFontSize = (screenWidth.value * 0.014f).coerceAtLeast(18f).coerceAtMost(22f).sp
+    val locationFontSize = (screenWidth.value * 0.014f).coerceAtLeast(18f).coerceAtMost(22f).sp
+    val courtFontSize = (screenWidth.value * 0.017f).coerceAtLeast(20f).coerceAtMost(26f).sp
+    val qrTextFontSize = (screenWidth.value * 0.014f).coerceAtLeast(18f).coerceAtMost(22f).sp
+
+    // 반응형 패딩 및 크기 - 여백도 조금 증가
+    val cardPadding = (cardWidth.value * 0.09f).coerceAtLeast(28f).coerceAtMost(44f).dp
+    val locationBoxWidth = (cardWidth * 0.65f).coerceAtLeast(250.dp)
+    val locationBoxHeight = (cardHeight * 0.09f).coerceAtLeast(55.dp)
+    val qrBoxSize = (cardWidth * 0.65f).coerceAtLeast(250.dp)
+
     Card(
         modifier = Modifier
-            .width(474.dp)
-            .height(818.dp),
+            .width(cardWidth)
+            .height(cardHeight),
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = White),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
@@ -69,16 +94,19 @@ fun CheckInCard(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 40.dp, vertical = 50.dp),
+                .padding(
+                    horizontal = cardPadding,
+                    vertical = (cardHeight * 0.071f).coerceAtLeast(30.dp)
+                ),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             // Title
             Text(
                 text = "출석 체크",
-                fontSize = 35.sp,
+                fontSize = titleFontSize,
                 fontWeight = FontWeight.Bold,
                 color = Color.Black,
-                modifier = Modifier.padding(bottom = 20.dp)
+                modifier = Modifier.padding(bottom = (cardHeight * 0.029f).coerceAtLeast(15.dp))
             )
 
             // Description with styled text
@@ -96,58 +124,57 @@ fun CheckInCard(
 
             Text(
                 text = annotatedText,
-                fontSize = 20.sp,
+                fontSize = descriptionFontSize,
                 textAlign = TextAlign.Center,
-                lineHeight = 28.sp,
-                modifier = Modifier.padding(bottom = 40.dp)
+                lineHeight = (descriptionFontSize.value * 1.4f).sp,
+                modifier = Modifier.padding(bottom = (cardHeight * 0.057f).coerceAtLeast(25.dp))
             )
 
             // Location Info Box
             Box(
                 modifier = Modifier
-                    .width(300.dp)
-                    .height(61.dp)
+                    .width(locationBoxWidth)
+                    .height(locationBoxHeight)
                     .background(Color(0xFFF2FAF4), RoundedCornerShape(8.dp)),
                 contentAlignment = Alignment.Center
             ) {
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(20.dp),
+                    horizontalArrangement = Arrangement.spacedBy((locationBoxWidth * 0.067f).coerceAtLeast(12.dp)),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
                         text = location.name,
-                        fontSize = 20.sp,
+                        fontSize = locationFontSize,
                         fontWeight = FontWeight.Medium,
                         color = Color.Black
                     )
                     Text(
                         text = location.court,
-                        fontSize = 24.sp,
+                        fontSize = courtFontSize,
                         fontWeight = FontWeight.Bold,
                         color = Color.Black
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.height(30.dp))
+            Spacer(modifier = Modifier.height((cardHeight * 0.043f).coerceAtLeast(20.dp)))
 
             // QR Code Area
             Box(
                 modifier = Modifier
-                    .width(300.dp)
-                    .height(300.dp)
+                    .size(qrBoxSize)
                     .background(Color(0xFFF3F3F3), RoundedCornerShape(12.dp)),
                 contentAlignment = Alignment.Center
             ) {
                 // QR 코드가 여기에 들어갈 예정
             }
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height((cardHeight * 0.029f).coerceAtLeast(15.dp)))
 
             // QR Instruction Text
             Text(
                 text = "QR코드를 찍어주세요",
-                fontSize = 20.02.sp,
+                fontSize = qrTextFontSize,
                 fontWeight = FontWeight.SemiBold,
                 color = Color(0xFF555555)
             )

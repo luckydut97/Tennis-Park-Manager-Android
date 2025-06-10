@@ -172,7 +172,8 @@ private fun AppPushDialog(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(30.dp),
-                verticalArrangement = Arrangement.spacedBy(20.dp)
+                verticalArrangement = Arrangement.spacedBy(20.dp),
+                horizontalAlignment = Alignment.CenterHorizontally // 제목 중앙 정렬
             ) {
                 // 제목
                 Text(
@@ -180,7 +181,6 @@ private fun AppPushDialog(
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.Black,
-                    modifier = Modifier.fillMaxWidth()
                 )
 
                 // 부제목

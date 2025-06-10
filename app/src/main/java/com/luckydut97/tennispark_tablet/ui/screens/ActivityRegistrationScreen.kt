@@ -551,7 +551,7 @@ private fun TimePickerDialog(
 fun ActivityRegistrationScreenPreview() {
     Tennispark_tabletTheme {
         ActivityRegistrationScreen(
-            selectedItem = "활동관리",
+            selectedItem = "활동 관리",
             onNavigateToHome = {},
             onNavigateToActivity = {},
             onNavigateToEvent = {},

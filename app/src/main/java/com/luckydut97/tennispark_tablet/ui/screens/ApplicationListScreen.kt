@@ -289,7 +289,7 @@ fun ApplicationTableDivider() {
 fun ApplicationListScreenPreview() {
     Tennispark_tabletTheme {
         ApplicationListScreen(
-            selectedItem = "활동관리",
+            selectedItem = "활동 관리",
             onNavigateToHome = {},
             onNavigateToActivity = {},
             onNavigateToEvent = {},

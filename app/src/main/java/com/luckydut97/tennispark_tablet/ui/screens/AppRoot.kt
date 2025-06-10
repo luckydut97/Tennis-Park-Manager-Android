@@ -14,7 +14,7 @@ fun AppRoot() {
     val navController = rememberNavController()
     val navBackStackEntry = navController.currentBackStackEntryAsState()
     val selectedItem = when (navBackStackEntry.value?.destination?.route) {
-        "activity" -> "활동관리"
+        "activity" -> "활동 관리"
         "event" -> "이벤트 관리"
         else -> "홈"
     }
@@ -24,7 +24,7 @@ fun AppRoot() {
             MainScreen(
                 selectedItem = selectedItem,
                 onNavigateToHome = { if (selectedItem != "홈") navController.navigate("home") { popUpTo("home") { inclusive = true } } },
-                onNavigateToActivity = { if (selectedItem != "활동관리") navController.navigate("activity") { popUpTo("home") } },
+                onNavigateToActivity = { if (selectedItem != "활동 관리") navController.navigate("activity") { popUpTo("home") } },
                 onNavigateToEvent = { if (selectedItem != "이벤트 관리") navController.navigate("event") { popUpTo("home") } },
                 onNavigateToSettings = { /* 설정 추가시 연결 */ }
             )

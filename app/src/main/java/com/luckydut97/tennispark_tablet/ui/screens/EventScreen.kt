@@ -55,8 +55,8 @@ fun TabletEventScreen(
         listOf(
             TabletBannerSlot("메인화면", "(300X100)"),
             TabletBannerSlot("활동신청", "(300X100)"),
-            TabletBannerSlot("구매목록", "(300X50)"),
-            TabletBannerSlot("회원정보", "(300X50)")
+            TabletBannerSlot("구매목록", "(300X100)"),
+            TabletBannerSlot("회원정보", "(300X100)")
         )
     }
 
@@ -118,8 +118,8 @@ fun TabletEventScreen(
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(46.dp)
                     ) {
-                        BannerCard(bannerSlots[2], Modifier.size(330.dp, 110.dp))
-                        BannerCard(bannerSlots[3], Modifier.size(330.dp, 110.dp))
+                        BannerCard(bannerSlots[2], Modifier.size(330.dp, 157.dp))
+                        BannerCard(bannerSlots[3], Modifier.size(330.dp, 157.dp))
                     }
                 }
             }

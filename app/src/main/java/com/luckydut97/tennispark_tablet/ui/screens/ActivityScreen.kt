@@ -59,8 +59,8 @@ fun TabletActivityScreen(
     val activities = remember {
         listOf(
             TabletActivity("수도공고 테니스장", "B코트", "10:00 - 12:00", 8, 12),
-            TabletActivity("수도공고 테니스장", "C코트", "14:00 - 16:00", 12, 12),
-            TabletActivity("수도공고 테니스장", "D코트", "18:00 - 20:00", 3, 12)
+            TabletActivity("강남 테니스장", "C코트", "14:00 - 16:00", 12, 12),
+            TabletActivity("서초 테니스장", "D코트", "18:00 - 20:00", 3, 12)
         )
     }
 
@@ -626,7 +626,7 @@ private fun TabletApplicationCard(activity: TabletActivity, onClick: () -> Unit)
 fun TabletActivityScreenPreview() {
     Tennispark_tabletTheme {
         TabletActivityScreen(
-            selectedItem = "활동관리",
+            selectedItem = "활동 관리",
             onNavigateToHome = {},
             onNavigateToActivity = {},
             onNavigateToEvent = {},

@@ -40,7 +40,7 @@ fun TennisParkTabletApp() {
             onNavigateToSettings = { currentScreen = "settings" } // 화면 전환 추가
         )
         "activity" -> TabletActivityScreen(
-            selectedItem = "활동관리",
+            selectedItem = "활동 관리",
             onNavigateToHome = { currentScreen = "main" },
             onNavigateToActivity = { /* already on activity */ },
             onNavigateToEvent = { currentScreen = "event" },
