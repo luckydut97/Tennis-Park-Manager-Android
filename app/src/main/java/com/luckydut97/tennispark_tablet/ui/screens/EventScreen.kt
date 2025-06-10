@@ -55,8 +55,8 @@ fun TabletEventScreen(
         listOf(
             TabletBannerSlot("메인화면", "(300X100)"),
             TabletBannerSlot("활동신청", "(300X100)"),
-            TabletBannerSlot("구매목록", "(300X100)"),
-            TabletBannerSlot("회원정보", "(300X100)")
+            TabletBannerSlot("구매목록", "(300X50)"),
+            TabletBannerSlot("회원정보", "(300X50)")
         )
     }
 
@@ -67,123 +67,142 @@ fun TabletEventScreen(
         )
     }
 
-    Column(
+    // 네비게이션바 높이 고려
+    val navBarHeight = 110.dp
+
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(TennisGreen)
+            .background(Color.White) // 전체 배경을 흰색으로
     ) {
-        TabletTopBar(title = "이벤트 관리", onBack = onNavigateToHome)
-
         Column(
             modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(24.dp)
+                .fillMaxSize()
+                .background(TennisGreen)
+                .statusBarsPadding()
+                .padding(bottom = navBarHeight) // 네비게이션바 공간 확보
         ) {
-            Spacer(modifier = Modifier.height(20.dp))
-
-            // 광고 배너 섹션
-            Row(
-                modifier = Modifier.width(754.dp),
-                horizontalArrangement = Arrangement.Start
-            ) {
-                Text(
-                    text = "광고 배너",
-                    color = White,
-                    fontSize = 26.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-
-            // 광고 배너 컨테이너
-            Box(
-                modifier = Modifier
-                    .width(754.dp)
-                    .height(342.76.dp)
-                    .background(Color(0xFFF2FAF4), RoundedCornerShape(8.dp))
-                    .padding(24.dp)
-            ) {
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(20.dp)
-                ) {
-                    // 첫 번째 행 - 큰 카드들
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(46.dp)
-                    ) {
-                        BannerCard(bannerSlots[0], Modifier.size(330.dp, 157.dp))
-                        BannerCard(bannerSlots[1], Modifier.size(330.dp, 157.dp))
-                    }
-                    // 두 번째 행 - 작은 카드들
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(46.dp)
-                    ) {
-                        BannerCard(bannerSlots[2], Modifier.size(330.dp, 157.dp))
-                        BannerCard(bannerSlots[3], Modifier.size(330.dp, 157.dp))
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.height(46.dp))
-
-            // 이벤트 섹션
-            Row(
-                modifier = Modifier.width(754.dp),
-                horizontalArrangement = Arrangement.Start
-            ) {
-                Text(
-                    text = "이벤트",
-                    color = White,
-                    fontSize = 26.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }
+            TabletTopBar(title = "이벤트 관리", onBack = onNavigateToHome)
 
             Column(
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(24.dp)
             ) {
-                eventItems.forEach { event ->
-                    EventCard(
-                        event = event,
-                        onClick = {
-                            if (event.title == "이벤트 만들기") {
-                                showEventDialog = true
-                            }
-                        }
+                Spacer(modifier = Modifier.height(20.dp))
+
+                // 광고 배너 섹션
+                Row(
+                    modifier = Modifier.width(754.dp),
+                    horizontalArrangement = Arrangement.Start
+                ) {
+                    Text(
+                        text = "광고 배너",
+                        color = White,
+                        fontSize = 26.sp,
+                        fontWeight = FontWeight.Bold
                     )
                 }
+
+                // 광고 배너 컨테이너
+                Box(
+                    modifier = Modifier
+                        .width(754.dp)
+                        .height(342.76.dp)
+                        .background(Color(0xFFF2FAF4), RoundedCornerShape(8.dp))
+                        .padding(24.dp)
+                ) {
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(20.dp)
+                    ) {
+                        // 첫 번째 행 - 큰 카드들
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(46.dp)
+                        ) {
+                            BannerCard(bannerSlots[0], Modifier.size(330.dp, 157.dp))
+                            BannerCard(bannerSlots[1], Modifier.size(330.dp, 157.dp))
+                        }
+                        // 두 번째 행 - 작은 카드들
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(46.dp)
+                        ) {
+                            BannerCard(bannerSlots[2], Modifier.size(330.dp, 110.dp))
+                            BannerCard(bannerSlots[3], Modifier.size(330.dp, 110.dp))
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(46.dp))
+
+                // 이벤트 섹션
+                Row(
+                    modifier = Modifier.width(754.dp),
+                    horizontalArrangement = Arrangement.Start
+                ) {
+                    Text(
+                        text = "이벤트",
+                        color = White,
+                        fontSize = 26.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    eventItems.forEach { event ->
+                        EventCard(
+                            event = event,
+                            onClick = {
+                                if (event.title == "이벤트 만들기") {
+                                    showEventDialog = true
+                                }
+                            }
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.weight(1f))
+
+                // 경기 기록 하기 버튼
+                Button(
+                    onClick = { /* Handle record game */ },
+                    modifier = Modifier.size(474.dp, 59.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFFFFFF57),
+                        contentColor = Color(0xFF145F44)
+                    ),
+                    shape = RoundedCornerShape(30.dp)
+                ) {
+                    Text(
+                        text = "경기 기록 하기",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(20.dp))
             }
-
-            Spacer(modifier = Modifier.weight(1f))
-
-            // 경기 기록 하기 버튼
-            Button(
-                onClick = { /* Handle record game */ },
-                modifier = Modifier.size(474.dp, 59.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFFFFFF57),
-                    contentColor = Color(0xFF145F44)
-                ),
-                shape = RoundedCornerShape(30.dp)
-            ) {
-                Text(
-                    text = "경기 기록 하기",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-
-            Spacer(modifier = Modifier.height(20.dp))
         }
 
-        // Bottom Navigation
-        BottomNavigationBar(
-            selectedItem = selectedItem,
-            onNavigateToHome = onNavigateToHome,
-            onNavigateToActivity = onNavigateToActivity,
-            onNavigateToEvent = onNavigateToEvent,
-            onNavigateToSettings = onNavigateToSettings
-        )
+        // 하단 네비게이션 - 절대 위치로 하단에 고정
+        Box(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .fillMaxWidth()
+                .background(Color.White) // 네비게이션바 배경과 동일
+                .navigationBarsPadding()
+        ) {
+            BottomNavigationBar(
+                selectedItem = selectedItem,
+                onNavigateToHome = onNavigateToHome,
+                onNavigateToActivity = onNavigateToActivity,
+                onNavigateToEvent = onNavigateToEvent,
+                onNavigateToSettings = onNavigateToSettings
+            )
+        }
     }
 
     // Event Creation Dialog

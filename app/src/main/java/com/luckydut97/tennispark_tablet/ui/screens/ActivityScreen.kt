@@ -64,6 +64,9 @@ fun TabletActivityScreen(
         )
     }
 
+    // 네비게이션바 높이 고려
+    val navBarHeight = 110.dp
+
     if (showRegistrationScreen) {
         ActivityRegistrationScreen(
             selectedItem = selectedItem,
@@ -83,58 +86,74 @@ fun TabletActivityScreen(
             onNavigateBack = { showApplicationListScreen = false }
         )
     } else {
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(TennisGreen),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .background(Color.White) // 전체 배경을 흰색으로
         ) {
-            TabletTopBar(title = "활동 관리", onBack = onNavigateToHome)
-
-            // Tab Row
-            Row(
+            Column(
                 modifier = Modifier
-                    .width(755.dp)
-                    .padding(vertical = 20.dp),
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    .fillMaxSize()
+                    .background(TennisGreen)
+                    .statusBarsPadding()
+                    .padding(bottom = navBarHeight), // 네비게이션바 공간 확보
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                TabletTabButton(
-                    text = "활동 등록",
-                    selected = currentTab == "활동 등록",
-                    onClick = { currentTab = "활동 등록" },
-                    modifier = Modifier.weight(1f)
-                )
-                TabletTabButton(
-                    text = "신청 내용",
-                    selected = currentTab == "신청 내용",
-                    onClick = { currentTab = "신청 내용" },
-                    modifier = Modifier.weight(1f)
-                )
-            }
+                TabletTopBar(title = "활동 관리", onBack = onNavigateToHome)
 
-            // Content Area
-            Box(
-                modifier = Modifier.weight(1f)
-            ) {
-                if (currentTab == "활동 등록") {
-                    TabletActivityListContent(activities = activities) {
-                        showRegistrationScreen = true
-                    }
-                } else {
-                    TabletApplicationContent {
-                        showApplicationListScreen = true
+                // Tab Row
+                Row(
+                    modifier = Modifier
+                        .width(755.dp)
+                        .padding(vertical = 20.dp),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    TabletTabButton(
+                        text = "활동 등록",
+                        selected = currentTab == "활동 등록",
+                        onClick = { currentTab = "활동 등록" },
+                        modifier = Modifier.weight(1f)
+                    )
+                    TabletTabButton(
+                        text = "신청 내용",
+                        selected = currentTab == "신청 내용",
+                        onClick = { currentTab = "신청 내용" },
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+
+                // Content Area
+                Box(
+                    modifier = Modifier.weight(1f)
+                ) {
+                    if (currentTab == "활동 등록") {
+                        TabletActivityListContent(activities = activities) {
+                            showRegistrationScreen = true
+                        }
+                    } else {
+                        TabletApplicationContent {
+                            showApplicationListScreen = true
+                        }
                     }
                 }
             }
 
-            // Bottom Navigation
-            BottomNavigationBar(
-                selectedItem = selectedItem,
-                onNavigateToHome = onNavigateToHome,
-                onNavigateToActivity = onNavigateToActivity,
-                onNavigateToEvent = onNavigateToEvent,
-                onNavigateToSettings = onNavigateToSettings
-            )
+            // 하단 네비게이션 - 절대 위치로 하단에 고정
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .fillMaxWidth()
+                    .background(Color.White) // 네비게이션바 배경과 동일
+                    .navigationBarsPadding()
+            ) {
+                BottomNavigationBar(
+                    selectedItem = selectedItem,
+                    onNavigateToHome = onNavigateToHome,
+                    onNavigateToActivity = onNavigateToActivity,
+                    onNavigateToEvent = onNavigateToEvent,
+                    onNavigateToSettings = onNavigateToSettings
+                )
+            }
         }
     }
 }
@@ -601,9 +620,9 @@ private fun TabletApplicationCard(activity: TabletActivity, onClick: () -> Unit)
                         .width(102.dp)
                         .height(46.dp)
                         .background(
-                            if (activity.maxParticipants - activity.currentParticipants == 1) 
-                                Color.Red 
-                            else 
+                            if (activity.maxParticipants - activity.currentParticipants == 1)
+                                Color.Red
+                            else
                                 Color(0xFF08432E),
                             RoundedCornerShape(8.dp)
                         ),

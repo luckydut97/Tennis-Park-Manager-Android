@@ -35,11 +35,20 @@ fun SettingScreen(
     var memberList by remember { mutableStateOf(dummyMemberData()) }
     val scrollState = rememberScrollState()
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    // 네비게이션바 높이 고려
+    val navBarHeight = 110.dp
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.White) // 전체 배경을 흰색으로
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(TennisGreen),
+                .background(TennisGreen)
+                .statusBarsPadding()
+                .padding(bottom = navBarHeight), // 네비게이션바 공간 확보
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             TabletTopBar(title = "설정", onBack = onNavigateToHome)
@@ -111,10 +120,17 @@ fun SettingScreen(
                         fontWeight = FontWeight.Bold
                     )
                 }
-
-                Spacer(modifier = Modifier.height(100.dp)) // Bottom Navigation 공간
             }
+        }
 
+        // 하단 네비게이션 - 절대 위치로 하단에 고정
+        Box(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .fillMaxWidth()
+                .background(Color.White) // 네비게이션바 배경과 동일
+                .navigationBarsPadding()
+        ) {
             BottomNavigationBar(
                 selectedItem = "설정",
                 onNavigateToHome = onNavigateToHome,
