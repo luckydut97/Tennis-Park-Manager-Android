@@ -12,9 +12,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.font.*
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.luckydut97.tennispark_tablet.R
 
 val MemberInfoTitleColor = Color.White
 val MemberInfoLabelColor = Color(0xFF787878)
@@ -129,12 +130,18 @@ fun MemberInfoSection(
     }
 }
 
+val pretendard = FontFamily(Font(R.font.pretendard_regular))
+
 @Composable
 fun MemberTableHeader_Modern() {
     val columnWidths = listOf(45.dp, 180.dp, 45.dp, 150.dp, 70.dp, 150.dp, 62.dp)
     val titles = listOf("NO", "ID", "성별", "구력", "나이", "인스타ID", "구분")
     val headerColor = Color(0xFF262626)
-    Row(Modifier.height(26.dp)) {
+    Row(
+        Modifier
+            .height(26.dp), // 오타! 반드시 데이터행과 동일하게
+        verticalAlignment = Alignment.CenterVertically
+    ) {
         titles.forEachIndexed { idx, t ->
             Box(
                 Modifier.width(columnWidths[idx]),
@@ -143,7 +150,8 @@ fun MemberTableHeader_Modern() {
                 Text(
                     t,
                     color = headerColor,
-                    fontSize = 22.sp,
+                    fontSize = 18.sp,
+                    fontFamily = pretendard,
                     fontWeight = FontWeight.SemiBold
                 )
             }
@@ -157,13 +165,17 @@ fun MemberTableRow_Modern(member: MemberInfo) {
     val values = listOf(
         member.no, member.id, member.gender, member.period, member.age, member.instaId, member.type
     )
-    Row(Modifier.height(26.dp)) {
+    Row(
+        Modifier.height(26.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
         values.forEachIndexed { idx, value ->
             Box(Modifier.width(columnWidths[idx]), contentAlignment = Alignment.Center) {
                 Text(
                     text = value,
                     color = Color(0xFF787878),
                     fontSize = 18.sp,
+                    fontFamily = pretendard,
                     fontWeight = FontWeight.Normal
                 )
             }
