@@ -1,6 +1,7 @@
 package com.luckydut97.tennispark_tablet.ui.components
 
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -110,19 +111,17 @@ private fun BottomNavItem(
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.width(120.dp)
+        modifier = Modifier
+            .width(120.dp)
+            .clickable(onClick = onClick)
+            .padding(vertical = 8.dp) // 클릭 영역 보완
     ) {
-        IconButton(
-            onClick = onClick,
-            modifier = Modifier.size(40.dp)
-        ) {
-            Icon(
-                painter = icon,
-                contentDescription = text,
-                modifier = Modifier.size(32.dp), // 28dp에서 32dp로 증가
-                tint = textColor
-            )
-        }
+        Icon(
+            painter = icon,
+            contentDescription = text,
+            modifier = Modifier.size(32.dp), // 28dp에서 32dp로 증가
+            tint = textColor
+        )
         Text(
             text = text,
             fontSize = 14.sp,

@@ -20,6 +20,9 @@ import androidx.compose.ui.window.Dialog
 import com.luckydut97.tennispark_tablet.ui.components.BottomNavigationBar
 import com.luckydut97.tennispark_tablet.ui.components.TabletTopBar
 import com.luckydut97.tennispark_tablet.ui.theme.*
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.ui.platform.LocalView
 
 @Composable
 fun ActivityRegistrationScreen(
@@ -40,147 +43,299 @@ fun ActivityRegistrationScreen(
     var showEndTimePicker by remember { mutableStateOf(false) }
 
     val weekDays = listOf("일", "월", "화", "수", "목", "금", "토")
+    val navBarHeight = 110.dp
 
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(TennisGreen),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .background(TennisGreen)
     ) {
-        TabletTopBar(title = "활동 등록", onBack = onNavigateBack)
-
         Column(
             modifier = Modifier
-                .weight(1f)
-                .width(754.dp)
-                .padding(vertical = 20.dp),
-            verticalArrangement = Arrangement.spacedBy(24.dp)
+                .fillMaxSize()
+                .statusBarsPadding()
+                .padding(bottom = navBarHeight),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // 활동 시간 선택 섹션
+            TabletTopBar(title = "활동 등록", onBack = onNavigateBack)
             Column(
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                modifier = Modifier
+                    .weight(1f)
+                    .width(754.dp)
+                    .verticalScroll(rememberScrollState()) // 내용이 길때 스크롤 처리
+                    .padding(vertical = 20.dp),
+                verticalArrangement = Arrangement.spacedBy(24.dp)
             ) {
-                Row {
-                    Text(
-                        text = "활동 시간 선택",
-                        fontSize = 18.sp,
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Text(
-                        text = "(활동 시작시간 ~ 종료시간)",
-                        fontSize = 18.sp,
-                        color = Color.White,
-                        fontWeight = FontWeight.Normal
-                    )
-                    Text(
-                        text = "*",
-                        fontSize = 18.sp,
-                        color = Color.Red,
-                        fontWeight = FontWeight.Normal
-                    )
-                }
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(60.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                // 활동 시간 선택 섹션
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    OutlinedButton(
-                        onClick = { showStartTimePicker = true },
-                        modifier = Modifier.size(358.dp, 60.dp),
-                        colors = ButtonDefaults.outlinedButtonColors(
-                            containerColor = Color.White,
-                            contentColor = Color.Black
-                        ),
-                        border = androidx.compose.foundation.BorderStroke(1.dp, Color.Gray),
-                        shape = RoundedCornerShape(8.dp)
-                    ) {
+                    Row {
                         Text(
-                            text = startTime,
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Normal
-                        )
-                    }
-
-                    Box(
-                        modifier = Modifier
-                            .width(38.dp)
-                            .height(60.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = "~",
-                            fontSize = 20.sp,
+                            text = "활동 시간 선택",
+                            fontSize = 18.sp,
                             color = Color.White,
                             fontWeight = FontWeight.Bold
                         )
-                    }
-
-                    OutlinedButton(
-                        onClick = { showEndTimePicker = true },
-                        modifier = Modifier.size(358.dp, 60.dp),
-                        colors = ButtonDefaults.outlinedButtonColors(
-                            containerColor = Color.White,
-                            contentColor = Color.Black
-                        ),
-                        border = androidx.compose.foundation.BorderStroke(1.dp, Color.Gray),
-                        shape = RoundedCornerShape(8.dp)
-                    ) {
                         Text(
-                            text = endTime,
-                            fontSize = 16.sp,
+                            text = "(활동 시작시간 ~ 종료시간)",
+                            fontSize = 18.sp,
+                            color = Color.White,
+                            fontWeight = FontWeight.Normal
+                        )
+                        Text(
+                            text = "*",
+                            fontSize = 18.sp,
+                            color = Color.Red,
                             fontWeight = FontWeight.Normal
                         )
                     }
-                }
-            }
 
-            // 활동 요일 선택 섹션
-            Column(
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                Row {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(60.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        OutlinedButton(
+                            onClick = { showStartTimePicker = true },
+                            modifier = Modifier.size(358.dp, 60.dp),
+                            colors = ButtonDefaults.outlinedButtonColors(
+                                containerColor = Color.White,
+                                contentColor = Color.Black
+                            ),
+                            border = androidx.compose.foundation.BorderStroke(1.dp, Color.Gray),
+                            shape = RoundedCornerShape(8.dp)
+                        ) {
+                            Text(
+                                text = startTime,
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Normal
+                            )
+                        }
+
+                        Box(
+                            modifier = Modifier
+                                .width(38.dp)
+                                .height(60.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = "~",
+                                fontSize = 20.sp,
+                                color = Color.White,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+
+                        OutlinedButton(
+                            onClick = { showEndTimePicker = true },
+                            modifier = Modifier.size(358.dp, 60.dp),
+                            colors = ButtonDefaults.outlinedButtonColors(
+                                containerColor = Color.White,
+                                contentColor = Color.Black
+                            ),
+                            border = androidx.compose.foundation.BorderStroke(1.dp, Color.Gray),
+                            shape = RoundedCornerShape(8.dp)
+                        ) {
+                            Text(
+                                text = endTime,
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Normal
+                            )
+                        }
+                    }
+                }
+
+                // 활동 요일 선택 섹션
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    Row {
+                        Text(
+                            text = "활동 요일 선택",
+                            fontSize = 18.sp,
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(
+                            text = "*",
+                            fontSize = 18.sp,
+                            color = Color.Red,
+                            fontWeight = FontWeight.Normal
+                        )
+                    }
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(60.dp),
+                        horizontalArrangement = Arrangement.spacedBy(12.5.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        weekDays.forEach { day ->
+                            Button(
+                                onClick = {
+                                    selectedDays = if (selectedDays.contains(day)) {
+                                        selectedDays - day
+                                    } else {
+                                        selectedDays + day
+                                    }
+                                },
+                                modifier = Modifier.size(97.dp, 60.dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = if (selectedDays.contains(day)) Color.White else Color(
+                                        0xFF0D6042
+                                    ),
+                                    contentColor = if (selectedDays.contains(day)) Color(0xFF0D6042) else Color.White
+                                ),
+                                shape = RoundedCornerShape(8.dp)
+                            ) {
+                                Text(
+                                    text = day,
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                        }
+                    }
+                }
+
+                // 운동 장소 섹션
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    Row {
+                        Text(
+                            text = "운동 장소",
+                            fontSize = 18.sp,
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(
+                            text = "*",
+                            fontSize = 18.sp,
+                            color = Color.Red,
+                            fontWeight = FontWeight.Normal
+                        )
+                    }
+
                     Text(
-                        text = "활동 요일 선택",
-                        fontSize = 18.sp,
+                        text = "장소명",
+                        fontSize = 16.sp,
                         color = Color.White,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Text(
-                        text = "*",
-                        fontSize = 18.sp,
-                        color = Color.Red,
                         fontWeight = FontWeight.Normal
                     )
+
+                    OutlinedTextField(
+                        value = placeName,
+                        onValueChange = { placeName = it },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(60.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = Color.White,
+                            unfocusedBorderColor = Color.White,
+                            focusedContainerColor = Color.White,
+                            unfocusedContainerColor = Color.White,
+                            focusedTextColor = Color.Black,
+                            unfocusedTextColor = Color.Black
+                        ),
+                        shape = RoundedCornerShape(8.dp),
+                        placeholder = {
+                            Text(
+                                text = "장소를 입력하세요",
+                                color = Color.Gray,
+                                fontSize = 16.sp
+                            )
+                        }
+                    )
+
+                    Text(
+                        text = "주소",
+                        fontSize = 16.sp,
+                        color = Color.White,
+                        fontWeight = FontWeight.Normal
+                    )
+
+                    OutlinedTextField(
+                        value = address,
+                        onValueChange = { address = it },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(60.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = Color.White,
+                            unfocusedBorderColor = Color.White,
+                            focusedContainerColor = Color.White,
+                            unfocusedContainerColor = Color.White,
+                            focusedTextColor = Color.Black,
+                            unfocusedTextColor = Color.Black
+                        ),
+                        shape = RoundedCornerShape(8.dp),
+                        placeholder = {
+                            Text(
+                                text = "주소를 입력하세요",
+                                color = Color.Gray,
+                                fontSize = 16.sp
+                            )
+                        }
+                    )
                 }
 
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(60.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.5.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                // 일정 반복여부 섹션
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    weekDays.forEach { day ->
+                    Row {
+                        Text(
+                            text = "일정 반복여부",
+                            fontSize = 18.sp,
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(
+                            text = "*",
+                            fontSize = 18.sp,
+                            color = Color.Red,
+                            fontWeight = FontWeight.Normal
+                        )
+                    }
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(60.dp),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
                         Button(
-                            onClick = {
-                                selectedDays = if (selectedDays.contains(day)) {
-                                    selectedDays - day
-                                } else {
-                                    selectedDays + day
-                                }
-                            },
-                            modifier = Modifier.size(97.dp, 60.dp),
+                            onClick = { isRepeating = true },
+                            modifier = Modifier.size(371.dp, 60.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = if (selectedDays.contains(day)) Color.White else Color(0xFF0D6042),
-                                contentColor = if (selectedDays.contains(day)) Color(0xFF0D6042) else Color.White
+                                containerColor = if (isRepeating) Color.White else Color(0xFF0D6042),
+                                contentColor = if (isRepeating) Color(0xFF0D6042) else Color.White
                             ),
                             shape = RoundedCornerShape(8.dp)
                         ) {
                             Text(
-                                text = day,
+                                text = "반복",
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+
+                        Button(
+                            onClick = { isRepeating = false },
+                            modifier = Modifier.size(371.dp, 60.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = if (!isRepeating) Color.White else Color(0xFF0D6042),
+                                contentColor = if (!isRepeating) Color(0xFF0D6042) else Color.White
+                            ),
+                            shape = RoundedCornerShape(8.dp)
+                        ) {
+                            Text(
+                                text = "반복 안함",
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Bold
                             )
@@ -188,157 +343,23 @@ fun ActivityRegistrationScreen(
                     }
                 }
             }
-
-            // 운동 장소 섹션
-            Column(
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                Row {
-                    Text(
-                        text = "운동 장소",
-                        fontSize = 18.sp,
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Text(
-                        text = "*",
-                        fontSize = 18.sp,
-                        color = Color.Red,
-                        fontWeight = FontWeight.Normal
-                    )
-                }
-
-                Text(
-                    text = "장소명",
-                    fontSize = 16.sp,
-                    color = Color.White,
-                    fontWeight = FontWeight.Normal
-                )
-
-                OutlinedTextField(
-                    value = placeName,
-                    onValueChange = { placeName = it },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(60.dp),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = Color.White,
-                        unfocusedBorderColor = Color.White,
-                        focusedContainerColor = Color.White,
-                        unfocusedContainerColor = Color.White,
-                        focusedTextColor = Color.Black,
-                        unfocusedTextColor = Color.Black
-                    ),
-                    shape = RoundedCornerShape(8.dp),
-                    placeholder = {
-                        Text(
-                            text = "장소를 입력하세요",
-                            color = Color.Gray,
-                            fontSize = 16.sp
-                        )
-                    }
-                )
-
-                Text(
-                    text = "주소",
-                    fontSize = 16.sp,
-                    color = Color.White,
-                    fontWeight = FontWeight.Normal
-                )
-
-                OutlinedTextField(
-                    value = address,
-                    onValueChange = { address = it },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(60.dp),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = Color.White,
-                        unfocusedBorderColor = Color.White,
-                        focusedContainerColor = Color.White,
-                        unfocusedContainerColor = Color.White,
-                        focusedTextColor = Color.Black,
-                        unfocusedTextColor = Color.Black
-                    ),
-                    shape = RoundedCornerShape(8.dp),
-                    placeholder = {
-                        Text(
-                            text = "주소를 입력하세요",
-                            color = Color.Gray,
-                            fontSize = 16.sp
-                        )
-                    }
-                )
-            }
-
-            // 일정 반복여부 섹션
-            Column(
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                Row {
-                    Text(
-                        text = "일정 반복여부",
-                        fontSize = 18.sp,
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Text(
-                        text = "*",
-                        fontSize = 18.sp,
-                        color = Color.Red,
-                        fontWeight = FontWeight.Normal
-                    )
-                }
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(60.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Button(
-                        onClick = { isRepeating = true },
-                        modifier = Modifier.size(371.dp, 60.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = if (isRepeating) Color.White else Color(0xFF0D6042),
-                            contentColor = if (isRepeating) Color(0xFF0D6042) else Color.White
-                        ),
-                        shape = RoundedCornerShape(8.dp)
-                    ) {
-                        Text(
-                            text = "반복",
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-
-                    Button(
-                        onClick = { isRepeating = false },
-                        modifier = Modifier.size(371.dp, 60.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = if (!isRepeating) Color.White else Color(0xFF0D6042),
-                            contentColor = if (!isRepeating) Color(0xFF0D6042) else Color.White
-                        ),
-                        shape = RoundedCornerShape(8.dp)
-                    ) {
-                        Text(
-                            text = "반복 안함",
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-                }
-            }
         }
-
-        BottomNavigationBar(
-            selectedItem = selectedItem,
-            onNavigateToHome = onNavigateToHome,
-            onNavigateToActivity = onNavigateToActivity,
-            onNavigateToEvent = onNavigateToEvent,
-            onNavigateToSettings = onNavigateToSettings
-        )
+        // 하단 네비게이션 (항상 하단 고정)
+        Box(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .fillMaxWidth()
+                .background(Color.White) // 네비게이션바 배경과 동일
+                .navigationBarsPadding()
+        ) {
+            BottomNavigationBar(
+                selectedItem = selectedItem,
+                onNavigateToHome = onNavigateToHome,
+                onNavigateToActivity = onNavigateToActivity,
+                onNavigateToEvent = onNavigateToEvent,
+                onNavigateToSettings = onNavigateToSettings
+            )
+        }
     }
 
     // 시작 시간 선택 다이얼로그
