@@ -104,8 +104,8 @@ fun TabletActivityScreen(
                 // Tab Row
                 Row(
                     modifier = Modifier
-                        .width(755.dp)
-                        .padding(vertical = 20.dp),
+                        .fillMaxWidth()
+                        .padding(horizontal = 40.dp, vertical = 20.dp),
                     horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     TabletTabButton(
@@ -194,7 +194,9 @@ private fun TabletActivityListContent(activities: List<TabletActivity>, onAddCli
     ) {
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(20.dp),
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 40.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             items(activities) { activity ->
@@ -228,7 +230,7 @@ private fun TabletActivityListContent(activities: List<TabletActivity>, onAddCli
 private fun TabletActivityCard(activity: TabletActivity) {
     Card(
         modifier = Modifier
-            .width(755.dp)
+            .fillMaxWidth()
             .height(78.dp),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = White),
@@ -303,7 +305,9 @@ private fun TabletApplicationContent(onCardClick: () -> Unit) {
     
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(20.dp),
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 40.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         items(applicationActivities) { activity ->
@@ -572,7 +576,7 @@ private fun TabletRepeatButton(
 private fun TabletApplicationCard(activity: TabletActivity, onClick: () -> Unit) {
     Card(
         modifier = Modifier
-            .width(755.dp)
+            .fillMaxWidth()
             .height(78.dp)
             .clickable { onClick() },
         shape = RoundedCornerShape(16.dp),

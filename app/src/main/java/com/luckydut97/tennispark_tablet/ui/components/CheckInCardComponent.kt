@@ -40,7 +40,7 @@ fun CheckInCardPager() {
 
     // 반응형 크기 계산
     val cardWidth = (screenWidth * 0.55f).coerceAtMost(474.dp).coerceAtLeast(320.dp)
-    val cardHeight = (screenHeight * 0.52f).coerceAtMost(750.dp).coerceAtLeast(580.dp)
+    val cardHeight = (screenHeight * 0.65f).coerceAtMost(900.dp).coerceAtLeast(700.dp)
     val horizontalPadding = ((screenWidth - cardWidth) / 2).coerceAtLeast(20.dp)
 
     val pagerState = rememberPagerState(pageCount = { locations.size })
@@ -65,7 +65,7 @@ fun CheckInCardPager() {
 fun CheckInCard(
     location: CheckInLocation,
     cardWidth: androidx.compose.ui.unit.Dp = 474.dp,
-    cardHeight: androidx.compose.ui.unit.Dp = 700.dp
+    cardHeight: androidx.compose.ui.unit.Dp = 850.dp
 ) {
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp.dp
@@ -81,7 +81,7 @@ fun CheckInCard(
     val cardPadding = (cardWidth.value * 0.09f).coerceAtLeast(28f).coerceAtMost(44f).dp
     val locationBoxWidth = (cardWidth * 0.65f).coerceAtLeast(250.dp)
     val locationBoxHeight = (cardHeight * 0.09f).coerceAtLeast(55.dp)
-    val qrBoxSize = (cardWidth * 0.65f).coerceAtLeast(250.dp)
+    val qrBoxSize = (cardWidth * 0.75f).coerceAtLeast(300.dp).coerceAtMost(400.dp)
 
     Card(
         modifier = Modifier
@@ -157,7 +157,7 @@ fun CheckInCard(
                 }
             }
 
-            Spacer(modifier = Modifier.height((cardHeight * 0.043f).coerceAtLeast(20.dp)))
+            Spacer(modifier = Modifier.height((cardHeight * 0.057f).coerceAtLeast(35.dp)))
 
             // QR Code Area
             Box(
@@ -169,7 +169,7 @@ fun CheckInCard(
                 // QR 코드가 여기에 들어갈 예정
             }
 
-            Spacer(modifier = Modifier.height((cardHeight * 0.029f).coerceAtLeast(15.dp)))
+            Spacer(modifier = Modifier.height((cardHeight * 0.043f).coerceAtLeast(25.dp)))
 
             // QR Instruction Text
             Text(

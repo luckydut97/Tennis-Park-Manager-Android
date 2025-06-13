@@ -15,7 +15,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.foundation.layout.navigationBarsPadding
 import com.luckydut97.tennispark_tablet.R
 import com.luckydut97.tennispark_tablet.ui.theme.*
 
@@ -28,7 +27,6 @@ fun BottomNavigationBar(
     onNavigateToSettings: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
-    // 위쪽 그림자를 위한 Box 추가
     Column(
         modifier = modifier.fillMaxWidth()
     ) {
@@ -48,49 +46,60 @@ fun BottomNavigationBar(
         )
 
         // 실제 네비게이션바
-        Surface(
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .navigationBarsPadding(),
-            color = Color.White
+                .background(Color.White)
         ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp), // 12dp에서 8dp로 줄임
-                horizontalArrangement = Arrangement.SpaceEvenly
+            Column(
+                modifier = Modifier.fillMaxWidth()
             ) {
-                BottomNavItem(
-                    icon = if (selectedItem == "홈") painterResource(R.drawable.ic_home_active) else painterResource(
-                        R.drawable.ic_home_deactive
-                    ),
-                    text = "홈",
-                    selected = selectedItem == "홈",
-                    onClick = onNavigateToHome
-                )
-                BottomNavItem(
-                    icon = if (selectedItem == "활동 관리") painterResource(R.drawable.activity_active) else painterResource(
-                        R.drawable.activity_deactive
-                    ),
-                    text = "활동 관리",
-                    selected = selectedItem == "활동 관리",
-                    onClick = onNavigateToActivity
-                )
-                BottomNavItem(
-                    icon = if (selectedItem == "이벤트 관리") painterResource(R.drawable.event_active) else painterResource(
-                        R.drawable.event_deactive
-                    ),
-                    text = "이벤트 관리",
-                    selected = selectedItem == "이벤트 관리",
-                    onClick = onNavigateToEvent
-                )
-                BottomNavItem(
-                    icon = if (selectedItem == "설정") painterResource(R.drawable.ic_setting_active) else painterResource(
-                        R.drawable.ic_setting_deactive
-                    ),
-                    text = "설정",
-                    selected = selectedItem == "설정",
-                    onClick = onNavigateToSettings
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp), // 12dp에서 8dp로 줄임
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    BottomNavItem(
+                        icon = if (selectedItem == "홈") painterResource(R.drawable.ic_home_active) else painterResource(
+                            R.drawable.ic_home_deactive
+                        ),
+                        text = "홈",
+                        selected = selectedItem == "홈",
+                        onClick = onNavigateToHome
+                    )
+                    BottomNavItem(
+                        icon = if (selectedItem == "활동 관리") painterResource(R.drawable.activity_active) else painterResource(
+                            R.drawable.activity_deactive
+                        ),
+                        text = "활동 관리",
+                        selected = selectedItem == "활동 관리",
+                        onClick = onNavigateToActivity
+                    )
+                    BottomNavItem(
+                        icon = if (selectedItem == "이벤트 관리") painterResource(R.drawable.event_active) else painterResource(
+                            R.drawable.event_deactive
+                        ),
+                        text = "이벤트 관리",
+                        selected = selectedItem == "이벤트 관리",
+                        onClick = onNavigateToEvent
+                    )
+                    BottomNavItem(
+                        icon = if (selectedItem == "설정") painterResource(R.drawable.ic_setting_active) else painterResource(
+                            R.drawable.ic_setting_deactive
+                        ),
+                        text = "설정",
+                        selected = selectedItem == "설정",
+                        onClick = onNavigateToSettings
+                    )
+                }
+
+                // 시스템 네비게이션 바 영역도 흰색으로 채우기
+                Spacer(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .navigationBarsPadding()
+                        .background(Color.White)
                 )
             }
         }

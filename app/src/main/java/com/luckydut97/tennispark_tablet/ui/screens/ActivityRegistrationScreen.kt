@@ -61,9 +61,9 @@ fun ActivityRegistrationScreen(
             Column(
                 modifier = Modifier
                     .weight(1f)
-                    .width(754.dp)
+                    .fillMaxWidth()
                     .verticalScroll(rememberScrollState()) // 내용이 길때 스크롤 처리
-                    .padding(vertical = 20.dp),
+                    .padding(horizontal = 40.dp, vertical = 20.dp),
                 verticalArrangement = Arrangement.spacedBy(24.dp)
             ) {
                 // 활동 시간 선택 섹션

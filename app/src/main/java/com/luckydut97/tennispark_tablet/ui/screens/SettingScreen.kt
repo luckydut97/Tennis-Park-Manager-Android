@@ -52,13 +52,13 @@ fun SettingScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             TabletTopBar(title = "설정", onBack = onNavigateToHome)
-            Spacer(modifier = Modifier.height(70.dp))
 
             Column(
                 modifier = Modifier
                     .weight(1f)
                     .verticalScroll(scrollState)
-                    .padding(horizontal = 40.dp),
+                    .padding(horizontal = 40.dp)
+                    .padding(top = 20.dp), // 상단 패딩만 추가
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(24.dp)
             ) {
@@ -100,13 +100,13 @@ fun SettingScreen(
                         }
                     }
                 )
-                Spacer(modifier = Modifier.height(70.dp))
+                Spacer(modifier = Modifier.height(30.dp)) // 줄인 Spacer
 
                 // 앱 푸시 버튼
                 Button(
                     onClick = { showPushDialog = true },
                     modifier = Modifier
-                        .width(754.dp)
+                        .fillMaxWidth()
                         .height(59.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color(0xFFFFFF57),
@@ -120,6 +120,8 @@ fun SettingScreen(
                         fontWeight = FontWeight.Bold
                     )
                 }
+
+                Spacer(modifier = Modifier.height(20.dp)) // 하단 패딩
             }
         }
 

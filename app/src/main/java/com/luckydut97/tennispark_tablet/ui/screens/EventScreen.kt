@@ -25,6 +25,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import com.luckydut97.tennispark_tablet.ui.components.BottomNavigationBar
 import com.luckydut97.tennispark_tablet.ui.components.TabletTopBar
 import com.luckydut97.tennispark_tablet.ui.theme.*
@@ -87,15 +89,16 @@ fun TabletEventScreen(
             Column(
                 modifier = Modifier
                     .weight(1f)
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 40.dp)
+                    .padding(top = 20.dp), // 상단 패딩만 추가
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(24.dp)
             ) {
-                Spacer(modifier = Modifier.height(20.dp))
-
                 // 광고 배너 섹션
                 Row(
-                    modifier = Modifier.width(754.dp),
+                    modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.Start
                 ) {
                     Text(
@@ -109,7 +112,7 @@ fun TabletEventScreen(
                 // 광고 배너 컨테이너
                 Box(
                     modifier = Modifier
-                        .width(754.dp)
+                        .fillMaxWidth()
                         .height(342.76.dp)
                         .background(Color(0xFFF2FAF4), RoundedCornerShape(8.dp))
                         .padding(24.dp)
@@ -119,17 +122,39 @@ fun TabletEventScreen(
                     ) {
                         // 첫 번째 행 - 큰 카드들
                         Row(
+                            modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.spacedBy(46.dp)
                         ) {
-                            BannerCard(bannerSlots[0], Modifier.size(330.dp, 157.dp))
-                            BannerCard(bannerSlots[1], Modifier.size(330.dp, 157.dp))
+                            BannerCard(
+                                banner = bannerSlots[0],
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .height(157.dp)
+                            )
+                            BannerCard(
+                                banner = bannerSlots[1],
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .height(157.dp)
+                            )
                         }
                         // 두 번째 행 - 작은 카드들
                         Row(
+                            modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.spacedBy(46.dp)
                         ) {
-                            BannerCard(bannerSlots[2], Modifier.size(330.dp, 110.dp))
-                            BannerCard(bannerSlots[3], Modifier.size(330.dp, 110.dp))
+                            BannerCard(
+                                banner = bannerSlots[2],
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .height(110.dp)
+                            )
+                            BannerCard(
+                                banner = bannerSlots[3],
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .height(110.dp)
+                            )
                         }
                     }
                 }
@@ -138,7 +163,7 @@ fun TabletEventScreen(
 
                 // 이벤트 섹션
                 Row(
-                    modifier = Modifier.width(754.dp),
+                    modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.Start
                 ) {
                     Text(
@@ -150,6 +175,7 @@ fun TabletEventScreen(
                 }
 
                 Column(
+                    modifier = Modifier.fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     eventItems.forEach { event ->
@@ -163,8 +189,6 @@ fun TabletEventScreen(
                         )
                     }
                 }
-
-                Spacer(modifier = Modifier.weight(1f))
 
                 // 경기 기록 하기 버튼
                 Button(
@@ -222,7 +246,7 @@ private fun BannerCard(
         // 배너 배경 박스
         Box(
             modifier = Modifier
-                .width(330.dp)
+                .fillMaxWidth()
                 .height(if (banner.title == "메인화면" || banner.title == "활동신청") 110.dp else 55.dp)
                 .background(Color(0xFFD8EBDC), RoundedCornerShape(8.dp))
         )
@@ -269,7 +293,7 @@ private fun EventCard(
 ) {
     Box(
         modifier = Modifier
-            .width(754.dp)
+            .fillMaxWidth()
             .height(78.dp)
             .background(Color(0xFFF2FAF4), RoundedCornerShape(8.dp))
             .padding(horizontal = 24.dp),

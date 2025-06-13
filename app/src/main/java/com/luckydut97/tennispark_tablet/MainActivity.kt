@@ -5,6 +5,9 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.*
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
+import androidx.core.view.WindowCompat
 import com.luckydut97.tennispark_tablet.ui.screens.SplashScreen
 import com.luckydut97.tennispark_tablet.ui.screens.MainScreen
 import com.luckydut97.tennispark_tablet.ui.screens.TabletActivityScreen
@@ -16,6 +19,17 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        // 시스템 바 색상 설정
+        window.statusBarColor = Color.Transparent.toArgb()
+        window.navigationBarColor = Color.White.toArgb()
+
+        // 라이트 모드 아이콘 설정 (어두운 아이콘)
+        WindowCompat.getInsetsController(window, window.decorView).apply {
+            isAppearanceLightStatusBars = false // 상태바는 녹색 배경이므로 밝은 아이콘
+            isAppearanceLightNavigationBars = true // 네비게이션바는 흰색 배경이므로 어두운 아이콘
+        }
+
         setContent {
             Tennispark_tabletTheme {
                 TennisParkTabletApp()
