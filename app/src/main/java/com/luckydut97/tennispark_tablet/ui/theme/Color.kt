@@ -9,6 +9,8 @@ val TennisVeryLightGreen = Color(0xFFF2FAF4) // 매우 연한 녹색 (입력 필
 val TennisYellow = Color(0xFFFFFF57)         // 노란색 (강조 버튼, CTA)
 
 // Additional Colors
+val TextfieldColor = Color(0xFF787878)
+val UnSelectedTextColor = Color(0xFF359170)
 val White = Color(0xFFFFFFFF)
 val Black = Color(0xFF000000)
 val Gray = Color(0xFF666666)

@@ -37,12 +37,15 @@ fun ActivityRegistrationScreen(
     var endTime by remember { mutableStateOf("00:00") }
     var selectedDays by remember { mutableStateOf(setOf<String>()) }
     var placeName by remember { mutableStateOf("") }
+    var courtName by remember { mutableStateOf("") }
     var address by remember { mutableStateOf("") }
     var isRepeating by remember { mutableStateOf(true) }
+    var selectedCourtType by remember { mutableStateOf("") }
     var showStartTimePicker by remember { mutableStateOf(false) }
     var showEndTimePicker by remember { mutableStateOf(false) }
 
     val weekDays = listOf("일", "월", "화", "수", "목", "금", "토")
+    val courtTypes = listOf("초보코트", "랠리코트", "게임스터디", "게임도전", "게임")
     val navBarHeight = 110.dp
 
     Box(
@@ -95,53 +98,54 @@ fun ActivityRegistrationScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(60.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         OutlinedButton(
                             onClick = { showStartTimePicker = true },
-                            modifier = Modifier.size(358.dp, 60.dp),
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(60.dp),
                             colors = ButtonDefaults.outlinedButtonColors(
                                 containerColor = Color.White,
-                                contentColor = Color.Black
+                                contentColor = TextfieldColor
                             ),
                             border = androidx.compose.foundation.BorderStroke(1.dp, Color.Gray),
                             shape = RoundedCornerShape(8.dp)
                         ) {
                             Text(
                                 text = startTime,
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Normal
+                                fontSize = 22.sp,
+                                fontWeight = FontWeight.Normal,
+                                color = if (startTime != "00:00") Color.Black else TextfieldColor
                             )
                         }
 
-                        Box(
-                            modifier = Modifier
-                                .width(38.dp)
-                                .height(60.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = "~",
-                                fontSize = 20.sp,
-                                color = Color.White,
-                                fontWeight = FontWeight.Bold
-                            )
-                        }
+                        Text(
+                            text = "~",
+                            fontSize = 20.sp,
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(horizontal = 8.dp)
+                        )
 
                         OutlinedButton(
                             onClick = { showEndTimePicker = true },
-                            modifier = Modifier.size(358.dp, 60.dp),
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(60.dp),
                             colors = ButtonDefaults.outlinedButtonColors(
                                 containerColor = Color.White,
-                                contentColor = Color.Black
+                                contentColor = TextfieldColor
                             ),
                             border = androidx.compose.foundation.BorderStroke(1.dp, Color.Gray),
                             shape = RoundedCornerShape(8.dp)
                         ) {
                             Text(
                                 text = endTime,
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Normal
+                                fontSize = 22.sp,
+                                fontWeight = FontWeight.Normal,
+                                color = if (endTime != "00:00") Color.Black else TextfieldColor
                             )
                         }
                     }
@@ -159,7 +163,7 @@ fun ActivityRegistrationScreen(
                             fontWeight = FontWeight.Bold
                         )
                         Text(
-                            text = "*",
+                            text = " *",
                             fontSize = 18.sp,
                             color = Color.Red,
                             fontWeight = FontWeight.Normal
@@ -170,7 +174,7 @@ fun ActivityRegistrationScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(60.dp),
-                        horizontalArrangement = Arrangement.spacedBy(12.5.dp),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         weekDays.forEach { day ->
@@ -182,19 +186,23 @@ fun ActivityRegistrationScreen(
                                         selectedDays + day
                                     }
                                 },
-                                modifier = Modifier.size(97.dp, 60.dp),
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .height(60.dp),
                                 colors = ButtonDefaults.buttonColors(
                                     containerColor = if (selectedDays.contains(day)) Color.White else Color(
                                         0xFF0D6042
                                     ),
-                                    contentColor = if (selectedDays.contains(day)) Color(0xFF0D6042) else Color.White
+                                    contentColor = if (selectedDays.contains(day)) Color.Black else Color(
+                                        0xFF359170
+                                    )
                                 ),
                                 shape = RoundedCornerShape(8.dp)
                             ) {
                                 Text(
                                     text = day,
-                                    fontSize = 16.sp,
-                                    fontWeight = FontWeight.Bold
+                                    fontSize = 21.sp,
+                                    fontWeight = if (selectedDays.contains(day)) FontWeight.Bold else FontWeight.Normal
                                 )
                             }
                         }
@@ -213,7 +221,7 @@ fun ActivityRegistrationScreen(
                             fontWeight = FontWeight.Bold
                         )
                         Text(
-                            text = "*",
+                            text = " *",
                             fontSize = 18.sp,
                             color = Color.Red,
                             fontWeight = FontWeight.Normal
@@ -245,10 +253,53 @@ fun ActivityRegistrationScreen(
                         placeholder = {
                             Text(
                                 text = "장소를 입력하세요",
-                                color = Color.Gray,
-                                fontSize = 16.sp
+                                color = TextfieldColor,
+                                fontSize = 22.sp,
+                                fontWeight = FontWeight.Normal
                             )
-                        }
+                        },
+                        textStyle = androidx.compose.ui.text.TextStyle(
+                            fontSize = 22.sp,
+                            fontWeight = FontWeight.SemiBold
+                        ),
+                        singleLine = true
+                    )
+
+                    Text(
+                        text = "코트명",
+                        fontSize = 16.sp,
+                        color = Color.White,
+                        fontWeight = FontWeight.Normal
+                    )
+
+                    OutlinedTextField(
+                        value = courtName,
+                        onValueChange = { courtName = it },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(60.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = Color.White,
+                            unfocusedBorderColor = Color.White,
+                            focusedContainerColor = Color.White,
+                            unfocusedContainerColor = Color.White,
+                            focusedTextColor = Color.Black,
+                            unfocusedTextColor = Color.Black
+                        ),
+                        shape = RoundedCornerShape(8.dp),
+                        placeholder = {
+                            Text(
+                                text = "코트명을 입력하세요",
+                                color = TextfieldColor,
+                                fontSize = 22.sp,
+                                fontWeight = FontWeight.Normal
+                            )
+                        },
+                        textStyle = androidx.compose.ui.text.TextStyle(
+                            fontSize = 22.sp,
+                            fontWeight = FontWeight.SemiBold
+                        ),
+                        singleLine = true
                     )
 
                     Text(
@@ -276,11 +327,65 @@ fun ActivityRegistrationScreen(
                         placeholder = {
                             Text(
                                 text = "주소를 입력하세요",
-                                color = Color.Gray,
-                                fontSize = 16.sp
+                                color = TextfieldColor,
+                                fontSize = 22.sp,
+                                fontWeight = FontWeight.Normal
                             )
-                        }
+                        },
+                        textStyle = androidx.compose.ui.text.TextStyle(
+                            fontSize = 22.sp,
+                            fontWeight = FontWeight.SemiBold
+                        ),
+                        singleLine = true
                     )
+                }
+
+                // 코트 타입 선택 섹션
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    Text(
+                        text = "코트 유형",
+                        fontSize = 16.sp,
+                        color = Color.White,
+                        fontWeight = FontWeight.Normal
+                    )
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(60.dp),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        courtTypes.forEach { type ->
+                            Button(
+                                onClick = {
+                                    selectedCourtType = if (selectedCourtType == type) "" else type
+                                },
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .height(60.dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = if (selectedCourtType == type) Color.White else Color(
+                                        0xFF0D6042
+                                    ),
+                                    contentColor = if (selectedCourtType == type) Color.Black else Color(
+                                        0xFF359170
+                                    )
+                                ),
+                                shape = RoundedCornerShape(8.dp),
+                                contentPadding = PaddingValues(horizontal = 4.dp)
+                            ) {
+                                Text(
+                                    text = type,
+                                    fontSize = 21.sp,
+                                    fontWeight = if (selectedCourtType == type) FontWeight.Bold else FontWeight.Normal,
+                                    maxLines = 1
+                                )
+                            }
+                        }
+                    }
                 }
 
                 // 일정 반복여부 섹션
@@ -295,7 +400,7 @@ fun ActivityRegistrationScreen(
                             fontWeight = FontWeight.Bold
                         )
                         Text(
-                            text = "*",
+                            text = " *",
                             fontSize = 18.sp,
                             color = Color.Red,
                             fontWeight = FontWeight.Normal
@@ -311,37 +416,69 @@ fun ActivityRegistrationScreen(
                     ) {
                         Button(
                             onClick = { isRepeating = true },
-                            modifier = Modifier.size(371.dp, 60.dp),
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(60.dp),
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = if (isRepeating) Color.White else Color(0xFF0D6042),
-                                contentColor = if (isRepeating) Color(0xFF0D6042) else Color.White
+                                contentColor = if (isRepeating) Color.Black else Color(0xFF359170)
                             ),
                             shape = RoundedCornerShape(8.dp)
                         ) {
                             Text(
                                 text = "반복",
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Bold
+                                fontSize = 21.sp,
+                                fontWeight = if (isRepeating) FontWeight.Bold else FontWeight.Normal
                             )
                         }
 
                         Button(
                             onClick = { isRepeating = false },
-                            modifier = Modifier.size(371.dp, 60.dp),
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(60.dp),
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = if (!isRepeating) Color.White else Color(0xFF0D6042),
-                                contentColor = if (!isRepeating) Color(0xFF0D6042) else Color.White
+                                contentColor = if (!isRepeating) Color.Black else Color(0xFF359170)
                             ),
                             shape = RoundedCornerShape(8.dp)
                         ) {
                             Text(
                                 text = "반복 안함",
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Bold
+                                fontSize = 21.sp,
+                                fontWeight = if (!isRepeating) FontWeight.Bold else FontWeight.Normal
                             )
                         }
                     }
                 }
+
+                // 등록 완료 버튼
+                Spacer(modifier = Modifier.height(40.dp))
+
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Button(
+                        onClick = { /* Registration complete action */ },
+                        modifier = Modifier
+                            .size(474.dp, 59.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFFFFFF57),
+                            contentColor = Color(0xFF08432E)
+                        ),
+                        shape = RoundedCornerShape(300.dp),
+                        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF145F44))
+                    ) {
+                        Text(
+                            text = "등록 완료",
+                            fontSize = 22.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(40.dp))
             }
         }
         // 하단 네비게이션 (항상 하단 고정)
