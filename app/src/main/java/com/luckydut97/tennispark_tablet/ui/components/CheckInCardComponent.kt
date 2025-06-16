@@ -40,7 +40,7 @@ fun CheckInCardPager() {
 
     // 반응형 크기 계산
     val cardWidth = (screenWidth * 0.55f).coerceAtMost(474.dp).coerceAtLeast(320.dp)
-    val cardHeight = (screenHeight * 0.65f).coerceAtMost(900.dp).coerceAtLeast(700.dp)
+    val cardHeight = (screenHeight * 0.58f).coerceAtMost(900.dp).coerceAtLeast(700.dp)
     val horizontalPadding = ((screenWidth - cardWidth) / 2).coerceAtLeast(20.dp)
 
     val pagerState = rememberPagerState(pageCount = { locations.size })

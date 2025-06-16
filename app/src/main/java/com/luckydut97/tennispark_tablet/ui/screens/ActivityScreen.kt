@@ -58,9 +58,19 @@ fun TabletActivityScreen(
 
     val activities = remember {
         listOf(
-            TabletActivity("수도공고 테니스장", "B코트", "10:00 - 12:00", 8, 12),
-            TabletActivity("강남 테니스장", "C코트", "14:00 - 16:00", 12, 12),
-            TabletActivity("서초 테니스장", "D코트", "18:00 - 20:00", 3, 12)
+            TabletActivity("수도공고 테니스장", "B코트", "10:00 ~ 12:00", 8, 12),
+            TabletActivity("강남 테니스장", "C코트", "14:00 ~ 16:00", 12, 12),
+            TabletActivity("서초 테니스장", "D코트", "18:00 ~ 20:00", 3, 12),
+            TabletActivity("잠실 테니스장", "A코트", "08:00 ~ 10:00", 5, 12),
+            TabletActivity("송파 테니스장", "B코트", "10:00 ~ 12:00", 7, 12),
+            TabletActivity("강동 테니스장", "C코트", "14:00 ~ 16:00", 10, 12),
+            TabletActivity("광진 테니스장", "A코트", "16:00 ~ 18:00", 4, 12),
+            TabletActivity("성동 테니스장", "B코트", "18:00 ~ 20:00", 9, 12),
+            TabletActivity("동대문 테니스장", "C코트", "08:00 ~ 10:00", 6, 12),
+            TabletActivity("중랑 테니스장", "D코트", "10:00 ~ 12:00", 11, 12),
+            TabletActivity("노원 테니스장", "A코트", "14:00 ~ 16:00", 2, 12),
+            TabletActivity("도봉 테니스장", "B코트", "16:00 ~ 18:00", 8, 12),
+            TabletActivity("강북 테니스장", "C코트", "18:00 ~ 20:00", 7, 12)
         )
     }
 
@@ -102,24 +112,78 @@ fun TabletActivityScreen(
                 TabletTopBar(title = "활동 관리", onBack = onNavigateToHome)
 
                 // Tab Row
-                Row(
+                Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 40.dp, vertical = 20.dp),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                        .padding(horizontal = 40.dp, vertical = 20.dp)
+                        .height(67.dp)
+                        .background(
+                            color = Color(0xFF0D6042),
+                            shape = RoundedCornerShape(300.dp)
+                        ),
+                    contentAlignment = Alignment.Center
                 ) {
-                    TabletTabButton(
-                        text = "활동 등록",
-                        selected = currentTab == "활동 등록",
-                        onClick = { currentTab = "활동 등록" },
-                        modifier = Modifier.weight(1f)
-                    )
-                    TabletTabButton(
-                        text = "신청 내용",
-                        selected = currentTab == "신청 내용",
-                        onClick = { currentTab = "신청 내용" },
-                        modifier = Modifier.weight(1f)
-                    )
+                    Row(
+                        modifier = Modifier.fillMaxSize(),
+                        horizontalArrangement = Arrangement.SpaceEvenly,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .fillMaxHeight()
+                                .padding(4.dp)
+                                .clickable { currentTab = "활동 등록" },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            if (currentTab == "활동 등록") {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .background(
+                                            color = Color.White,
+                                            shape = RoundedCornerShape(300.dp)
+                                        )
+                                )
+                            }
+                            Text(
+                                text = "활동 등록",
+                                fontSize = 24.sp,
+                                fontWeight = if (currentTab == "활동 등록") FontWeight.Bold else FontWeight.SemiBold,
+                                color = if (currentTab == "활동 등록") Color(0xFF0D6042) else Color(
+                                    0xFF359170
+                                )
+                            )
+                        }
+
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .fillMaxHeight()
+                                .padding(4.dp)
+                                .clickable { currentTab = "신청 내용" },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            if (currentTab == "신청 내용") {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .background(
+                                            color = Color.White,
+                                            shape = RoundedCornerShape(300.dp)
+                                        )
+                                )
+                            }
+                            Text(
+                                text = "신청 내용",
+                                fontSize = 24.sp,
+                                fontWeight = if (currentTab == "신청 내용") FontWeight.Bold else FontWeight.SemiBold,
+                                color = if (currentTab == "신청 내용") Color(0xFF0D6042) else Color(
+                                    0xFF359170
+                                )
+                            )
+                        }
+                    }
                 }
 
                 // Content Area
@@ -159,34 +223,6 @@ fun TabletActivityScreen(
 }
 
 @Composable
-private fun TabletTabButton(
-    text: String,
-    selected: Boolean,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Button(
-        onClick = onClick,
-        modifier = modifier.height(60.dp),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = if (selected) White else Color.Transparent,
-            contentColor = if (selected) TennisGreen else White
-        ),
-        shape = RoundedCornerShape(30.dp),
-        border = androidx.compose.foundation.BorderStroke(
-            width = 2.dp,
-            color = if (selected) White else White.copy(alpha = 0.5f)
-        )
-    ) {
-        Text(
-            text = text,
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold
-        )
-    }
-}
-
-@Composable
 private fun TabletActivityListContent(activities: List<TabletActivity>, onAddClick: () -> Unit) {
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -212,7 +248,7 @@ private fun TabletActivityListContent(activities: List<TabletActivity>, onAddCli
             onClick = onAddClick,
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .padding(bottom = 40.dp)
+                .padding(bottom = 60.dp)
                 .size(80.dp),
             containerColor = White,
             contentColor = TennisGreen
@@ -232,8 +268,8 @@ private fun TabletActivityCard(activity: TabletActivity) {
         modifier = Modifier
             .fillMaxWidth()
             .height(78.dp),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = White),
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFF2FAF4)),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Row(
@@ -272,22 +308,44 @@ private fun TabletActivityCard(activity: TabletActivity) {
                     color = Color.Black
                 )
 
-                OutlinedButton(
-                    onClick = { /* Handle edit */ },
-                    colors = ButtonDefaults.outlinedButtonColors(
-                        containerColor = Color.Transparent,
-                        contentColor = Color(0xFF08432E)
-                    ),
-                    border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF08432E)),
-                    shape = RoundedCornerShape(8.dp),
-                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                    modifier = Modifier.size(102.dp, 46.dp)
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Text(
-                        text = "수정",
-                        fontSize = 22.sp,
-                        fontWeight = FontWeight.Bold
-                    )
+                    OutlinedButton(
+                        onClick = { /* Handle edit */ },
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            containerColor = Color.Transparent,
+                            contentColor = Color(0xFF08432E)
+                        ),
+                        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF08432E)),
+                        shape = RoundedCornerShape(8.dp),
+                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                        modifier = Modifier.size(102.dp, 46.dp)
+                    ) {
+                        Text(
+                            text = "수정",
+                            fontSize = 22.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+
+                    OutlinedButton(
+                        onClick = { /* Handle delete */ },
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            containerColor = Color.Transparent,
+                            contentColor = Color(0xFF08432E)
+                        ),
+                        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF08432E)),
+                        shape = RoundedCornerShape(8.dp),
+                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                        modifier = Modifier.size(102.dp, 46.dp)
+                    ) {
+                        Text(
+                            text = "삭제",
+                            fontSize = 22.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
                 }
             }
         }
@@ -298,8 +356,19 @@ private fun TabletActivityCard(activity: TabletActivity) {
 private fun TabletApplicationContent(onCardClick: () -> Unit) {
     val applicationActivities = remember {
         listOf(
-            TabletActivity("수도공고 테니스장", "B코트", "10:00 - 12:00", 11, 12),
-            TabletActivity("수도공고 테니스장", "C코트", "14:00 - 16:00", 0, 12)
+            TabletActivity("수도공고 테니스장", "B코트", "10:00 ~ 12:00", 11, 12),
+            TabletActivity("수도공고 테니스장", "C코트", "14:00 ~ 16:00", 0, 12),
+            TabletActivity("강남 테니스장", "A코트", "08:00 ~ 10:00", 8, 12),
+            TabletActivity("서초 테니스장", "B코트", "10:00 ~ 12:00", 5, 12),
+            TabletActivity("잠실 테니스장", "C코트", "12:00 ~ 14:00", 12, 12),
+            TabletActivity("송파 테니스장", "D코트", "14:00 ~ 16:00", 3, 12),
+            TabletActivity("강동 테니스장", "A코트", "16:00 ~ 18:00", 7, 12),
+            TabletActivity("광진 테니스장", "B코트", "18:00 ~ 20:00", 9, 12),
+            TabletActivity("성동 테니스장", "C코트", "08:00 ~ 10:00", 4, 12),
+            TabletActivity("동대문 테니스장", "D코트", "10:00 ~ 12:00", 10, 12),
+            TabletActivity("중랑 테니스장", "A코트", "12:00 ~ 14:00", 6, 12),
+            TabletActivity("노원 테니스장", "B코트", "14:00 ~ 16:00", 2, 12),
+            TabletActivity("도봉 테니스장", "C코트", "16:00 ~ 18:00", 11, 12)
         )
     }
     
@@ -317,7 +386,7 @@ private fun TabletApplicationContent(onCardClick: () -> Unit) {
             )
         }
         item {
-            Spacer(modifier = Modifier.height(100.dp))
+            Spacer(modifier = Modifier.height(40.dp)) // Bottom spacing for navigation bar
         }
     }
 }
@@ -579,8 +648,8 @@ private fun TabletApplicationCard(activity: TabletActivity, onClick: () -> Unit)
             .fillMaxWidth()
             .height(78.dp)
             .clickable { onClick() },
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = White),
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFF2FAF4)),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Row(
@@ -625,9 +694,9 @@ private fun TabletApplicationCard(activity: TabletActivity, onClick: () -> Unit)
                         .height(46.dp)
                         .background(
                             if (activity.maxParticipants - activity.currentParticipants == 1)
-                                Color.Red
+                                Color(0xFFE63736)
                             else
-                                Color(0xFF08432E),
+                                Color(0xFF207B5B),
                             RoundedCornerShape(8.dp)
                         ),
                     contentAlignment = Alignment.Center

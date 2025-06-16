@@ -110,7 +110,7 @@ fun MainScreen(
             ) {
                 Text(
                     text = "상품 결제",
-                    fontSize = 18.sp,
+                    fontSize = 22.sp,
                     fontWeight = FontWeight.Bold
                 )
             }

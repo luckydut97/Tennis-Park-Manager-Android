@@ -1,35 +1,36 @@
 package com.luckydut97.tennispark_tablet.ui.screens
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
+
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
+
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.DirectionsRun
-import androidx.compose.material.icons.filled.EventNote
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Settings
+
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
+
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
+
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
+
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import com.luckydut97.tennispark_tablet.ui.components.BottomNavigationBar
 import com.luckydut97.tennispark_tablet.ui.components.TabletTopBar
 import com.luckydut97.tennispark_tablet.ui.theme.*
+
+import androidx.compose.foundation.BorderStroke
+
+
+import androidx.compose.runtime.saveable.rememberSaveable
+import com.luckydut97.tennispark_tablet.ui.components.EventCreateBottomSheet
+import com.luckydut97.tennispark_tablet.ui.components.EventEditBottomSheet
+import com.luckydut97.tennispark_tablet.ui.components.GameRecordBottomSheet
 
 data class TabletBannerSlot(
     val title: String,
@@ -42,7 +43,6 @@ data class TabletEventItem(
     val points: Int
 )
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TabletEventScreen(
     selectedItem: String,
@@ -52,6 +52,9 @@ fun TabletEventScreen(
     onNavigateToSettings: () -> Unit
 ) {
     var showEventDialog by remember { mutableStateOf(false) }
+    var showEditDialog by rememberSaveable { mutableStateOf(false) }
+    var showGameDialog by remember { mutableStateOf(false) }
+    var selectedEvent by rememberSaveable { mutableStateOf<TabletEventItem?>(null) }
 
     val bannerSlots = remember {
         listOf(
@@ -113,7 +116,6 @@ fun TabletEventScreen(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(342.76.dp)
                         .background(Color(0xFFF2FAF4), RoundedCornerShape(8.dp))
                         .padding(24.dp)
                 ) {
@@ -147,19 +149,19 @@ fun TabletEventScreen(
                                 banner = bannerSlots[2],
                                 modifier = Modifier
                                     .weight(1f)
-                                    .height(110.dp)
+                                    .height(157.dp)
                             )
                             BannerCard(
                                 banner = bannerSlots[3],
                                 modifier = Modifier
                                     .weight(1f)
-                                    .height(110.dp)
+                                    .height(157.dp)
                             )
                         }
                     }
                 }
 
-                Spacer(modifier = Modifier.height(46.dp))
+                Spacer(modifier = Modifier.height(40.dp))
 
                 // 이벤트 섹션
                 Row(
@@ -182,29 +184,75 @@ fun TabletEventScreen(
                         EventCard(
                             event = event,
                             onClick = {
-                                if (event.title == "이벤트 만들기") {
-                                    showEventDialog = true
-                                }
+                                selectedEvent = event
+                                showEditDialog = true
                             }
                         )
                     }
+
+                    // 이벤트 추가 버튼
+                    Button(
+                        onClick = { showEventDialog = true },
+                        modifier = Modifier
+                            .size(160.dp, 40.dp)
+                            .align(Alignment.CenterHorizontally),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFF145F44),
+                            contentColor = Color.White
+                        ),
+                        shape = RoundedCornerShape(6.dp)
+                    ) {
+                        Text(
+                            text = "+ 이벤트 추가",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(40.dp))
                 }
 
-                // 경기 기록 하기 버튼
-                Button(
-                    onClick = { /* Handle record game */ },
-                    modifier = Modifier.size(474.dp, 59.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFFFFFF57),
-                        contentColor = Color(0xFF145F44)
-                    ),
-                    shape = RoundedCornerShape(30.dp)
+                // 경기 기록 하기 & 이번주 활동 사진 버튼들
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(20.dp)
                 ) {
-                    Text(
-                        text = "경기 기록 하기",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold
-                    )
+                    Button(
+                        onClick = { showGameDialog = true },
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(59.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFFFFFF57),
+                            contentColor = Color(0xFF08432E)
+                        ),
+                        shape = RoundedCornerShape(30.dp)
+                    ) {
+                        Text(
+                            text = "경기 기록 하기",
+                            fontSize = 22.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+
+                    Button(
+                        onClick = { /* Handle weekly photos */ },
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(59.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFFFFFF57),
+                            contentColor = Color(0xFF08432E)
+                        ),
+                        shape = RoundedCornerShape(30.dp)
+                    ) {
+                        Text(
+                            text = "이번주 활동 사진",
+                            fontSize = 22.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(20.dp))
@@ -231,7 +279,40 @@ fun TabletEventScreen(
 
     // Event Creation Dialog
     if (showEventDialog) {
+        EventCreateBottomSheet(
+            onDismiss = { showEventDialog = false },
+            onConfirm = { name, content, points ->
+                // Handle event creation
+                showEventDialog = false
+            }
+        )
+    }
 
+    // Event Edit Dialog
+    if (showEditDialog && selectedEvent != null) {
+        EventEditBottomSheet(
+            event = selectedEvent!!,
+            onDismiss = { showEditDialog = false },
+            onDelete = {
+                // Handle event deletion
+                showEditDialog = false
+            },
+            onUpdate = { name, content, points ->
+                // Handle event update
+                showEditDialog = false
+            }
+        )
+    }
+
+    // Game Record Dialog
+    if (showGameDialog) {
+        GameRecordBottomSheet(
+            onDismiss = { showGameDialog = false },
+            onConfirm = { teamA1, teamA2, teamB1, teamB2, scoreA, scoreB ->
+                // Handle game record
+                showGameDialog = false
+            }
+        )
     }
 }
 
@@ -247,7 +328,7 @@ private fun BannerCard(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(if (banner.title == "메인화면" || banner.title == "활동신청") 110.dp else 55.dp)
+                .height(110.dp)
                 .background(Color(0xFFD8EBDC), RoundedCornerShape(8.dp))
         )
 
@@ -272,7 +353,7 @@ private fun BannerCard(
                     containerColor = Color.Transparent,
                     contentColor = Color(0xFF08432E)
                 ),
-                border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF08432E)),
+                border = BorderStroke(1.dp, Color(0xFF08432E)),
                 shape = RoundedCornerShape(8.dp),
                 contentPadding = PaddingValues(horizontal = 16.dp, vertical = 6.dp),
                 modifier = Modifier.height(32.dp)
@@ -328,7 +409,7 @@ private fun EventCard(
                         containerColor = Color.Transparent,
                         contentColor = Color(0xFF08432E)
                     ),
-                    border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF08432E)),
+                    border = BorderStroke(1.dp, Color(0xFF08432E)),
                     shape = RoundedCornerShape(8.dp),
                     contentPadding = PaddingValues(horizontal = 20.dp, vertical = 8.dp),
                     modifier = Modifier.height(40.dp)

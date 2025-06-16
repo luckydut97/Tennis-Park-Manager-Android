@@ -74,26 +74,27 @@ fun ApplicationListScreen(
             ) {
                 // 테이블 헤더
                 ApplicationTableHeader()
-                
-                // 구분선
-                ApplicationTableDivider()
+
+                // 헤더 아래 구분선
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 26.dp)
+                        .height(1.dp)
+                        .background(Color(0xFFE0E0E0))
+                )
 
                 // 테이블 내용 (최대 15개 보이고 스크롤)
                 LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                    modifier = Modifier.fillMaxSize()
                 ) {
                     itemsIndexed(applications.take(15)) { index, application ->
                         ApplicationTableRow(application = application)
-                        if (index < 14) { // 15개 중 마지막이 아닐 때만 구분선
-                            ApplicationTableDivider()
-                        }
                     }
                     
                     // 15개 이상일 때 추가 데이터는 스크롤로
                     if (applications.size > 15) {
                         itemsIndexed(applications.drop(15)) { index, application ->
-                            ApplicationTableDivider()
                             ApplicationTableRow(application = application)
                         }
                     }
@@ -152,7 +153,7 @@ fun ApplicationTableRow(application: ApplicationInfo) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(50.dp)
+            .height(48.dp)
             .padding(horizontal = 16.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
@@ -218,8 +219,8 @@ fun ApplicationTableRow(application: ApplicationInfo) {
                 OutlinedButton(
                     onClick = { expanded = true },
                     modifier = Modifier
-                        .width(120.dp)
-                        .height(36.dp),
+                        .width(140.dp)
+                        .height(33.84.dp),
                     colors = ButtonDefaults.outlinedButtonColors(
                         containerColor = Color.Transparent,
                         contentColor = Color.Black // 비고 버튼 텍스트 색상 변경

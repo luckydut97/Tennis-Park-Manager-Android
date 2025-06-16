@@ -1,16 +1,19 @@
 package com.luckydut97.tennispark_tablet.ui.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -116,8 +119,9 @@ fun SettingScreen(
                 ) {
                     Text(
                         text = "앱 푸시",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold
+                        fontSize = 22.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF08432E)
                     )
                 }
 
@@ -189,68 +193,111 @@ private fun AppPushDialog(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(30.dp),
-                verticalArrangement = Arrangement.spacedBy(20.dp),
-                horizontalAlignment = Alignment.CenterHorizontally // 제목 중앙 정렬
+                    .padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                // 드래그 핸들
+                Box(
+                    modifier = Modifier
+                        .width(32.dp)
+                        .height(4.dp)
+                        .background(Color(0xFFE0E0E0), RoundedCornerShape(2.dp))
+                )
+                
+                Spacer(modifier = Modifier.height(20.dp))
+                
                 // 제목
                 Text(
-                    text = "앱푸시",
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.Black,
+                    text = "앱 푸시",
+                    fontSize = 19.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Color.Black
                 )
 
-                // 부제목
-                Text(
-                    text = "공지사항 안내",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = Color(0xFF555555)
-                )
+                Spacer(modifier = Modifier.height(24.dp))
 
-                // 메시지 입력 필드
-                OutlinedTextField(
-                    value = pushMessage,
-                    onValueChange = { pushMessage = it },
-                    placeholder = {
-                        Text(
-                            text = "회원들에게 공지할 내용을 작성해 주세요.",
-                            color = Color(0xFF787878),
-                            fontSize = 16.sp
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    // 부제목
+                    Text(
+                        text = "공지사항 안내",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = Color(0xFF262626),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    // 메시지 입력 필드
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(Color.Transparent, RoundedCornerShape(12.dp))
+                            .border(
+                                width = 1.dp,
+                                color = Color(0xFFD2D2D2),
+                                shape = RoundedCornerShape(12.dp)
+                            )
+                            .padding(horizontal = 16.dp, vertical = 0.dp)
+                    ) {
+                        BasicTextField(
+                            value = pushMessage,
+                            onValueChange = { pushMessage = it },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .heightIn(min = 56.dp)
+                                .align(Alignment.CenterStart),
+                            textStyle = TextStyle(
+                                color = Color(0xFF262626),
+                                fontSize = 22.sp,
+                                fontWeight = FontWeight.Normal,
+                                lineHeight = 30.sp // Pretendard 기본 lineHeight와 유사
+                            ),
+                            maxLines = 10,
+                            singleLine = false,
+                            decorationBox = { innerTextField ->
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .defaultMinSize(minHeight = 56.dp),
+                                    contentAlignment = Alignment.CenterStart
+                                ) {
+                                    if (pushMessage.isEmpty()) {
+                                        Text(
+                                            text = "회원들에게 공지할 내용을 작성해 주세요.",
+                                            color = Color(0xFF787878),
+                                            fontSize = 22.sp,
+                                            fontWeight = FontWeight.Normal,
+                                            // Pretendard 가정
+                                        )
+                                    }
+                                    innerTextField()
+                                }
+                            }
                         )
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .heightIn(min = 120.dp),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = Color(0xFF145F44),
-                        unfocusedBorderColor = Color(0xFFD2D2D2),
-                        focusedContainerColor = Color(0xFFF2FAF4),
-                        unfocusedContainerColor = Color(0xFFF2FAF4)
-                    ),
-                    shape = RoundedCornerShape(12.dp),
-                    textStyle = LocalTextStyle.current.copy(fontSize = 16.sp),
-                    maxLines = 6
-                )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(24.dp))
 
                 // 등록하기 버튼
                 Button(
                     onClick = { onConfirm(pushMessage) },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(60.dp),
+                        .height(56.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color(0xFF145F44),
                         contentColor = White
                     ),
-                    shape = RoundedCornerShape(12.dp),
-                    enabled = pushMessage.isNotBlank()
+                    shape = RoundedCornerShape(12.dp)
                 ) {
                     Text(
                         text = "등록하기",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.SemiBold,
+
                     )
                 }
             }
