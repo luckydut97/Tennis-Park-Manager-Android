@@ -192,4 +192,8 @@ object Constants {
         const val BUTTON_HEIGHT_LARGE = 56
         const val BUTTON_HEIGHT_XLARGE = 64
     }
+
+    // ==================== 추가 상수 ====================
+    const val BASE_URL = "https://tennis-park.store/"
+    const val ACCESS_TOKEN = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsInJvbGUiOiJBRE1JTiIsImV4cCI6MjExMDA3NzIzMCwiaWF0IjoxNzUwMDc3MjMwfQ.lHmvLsdorChZ82oM5V9n-hNaUXQbFT8LV05-6N48V3g"
 }

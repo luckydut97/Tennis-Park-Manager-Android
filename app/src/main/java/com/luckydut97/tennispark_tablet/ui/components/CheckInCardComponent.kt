@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.platform.LocalConfiguration
 import com.luckydut97.tennispark_tablet.ui.theme.*
+import com.luckydut97.tennispark_tablet.data.network.ActivityResponse
 
 data class CheckInLocation(
     val name: String,
@@ -27,12 +28,17 @@ data class CheckInLocation(
 
 @OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
 @Composable
-fun CheckInCardPager() {
-    val locations = listOf(
-        CheckInLocation("수도공고 테니스장", "A코트"),
-        CheckInLocation("강남 테니스장", "B코트"),
-        CheckInLocation("서초 테니스장", "C코트")
-    )
+fun CheckInCardPager(activities: List<ActivityResponse> = emptyList()) {
+    // API 데이터가 없으면 기본 데이터 사용
+    val locations = if (activities.isEmpty()) {
+        listOf(
+            CheckInLocation("활동을 등록해주세요", "!")
+        )
+    } else {
+        activities.map { activity ->
+            CheckInLocation(activity.placeName, activity.courtName)
+        }
+    }
 
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp.dp
