@@ -33,4 +33,13 @@ object ApiProvider {
             .build()
             .create(ActivityApiService::class.java)
     }
+
+    val eventService: com.luckydut97.tennispark_tablet.data.network.event.EventApiService by lazy {
+        Retrofit.Builder()
+            .baseUrl(Constants.BASE_URL)
+            .client(okHttpClient)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(com.luckydut97.tennispark_tablet.data.network.event.EventApiService::class.java)
+    }
 }

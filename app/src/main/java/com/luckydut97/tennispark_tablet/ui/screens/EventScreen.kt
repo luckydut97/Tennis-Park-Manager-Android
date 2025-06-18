@@ -1,36 +1,33 @@
 package com.luckydut97.tennispark_tablet.ui.screens
 
 import androidx.compose.foundation.background
-
 import androidx.compose.foundation.layout.*
-
 import androidx.compose.foundation.shape.RoundedCornerShape
-
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-
 import androidx.compose.ui.text.font.FontWeight
-
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import com.luckydut97.tennispark_tablet.ui.components.BottomNavigationBar
 import com.luckydut97.tennispark_tablet.ui.components.TabletTopBar
 import com.luckydut97.tennispark_tablet.ui.theme.*
-
 import androidx.compose.foundation.BorderStroke
-
-
 import androidx.compose.runtime.saveable.rememberSaveable
 import com.luckydut97.tennispark_tablet.ui.components.EventCreateBottomSheet
 import com.luckydut97.tennispark_tablet.ui.components.EventEditBottomSheet
 import com.luckydut97.tennispark_tablet.ui.components.GameRecordBottomSheet
+import com.luckydut97.tennispark_tablet.data.repository.EventRepository
+import com.luckydut97.tennispark_tablet.data.network.event.EventItem
+import com.luckydut97.tennispark_tablet.ui.viewmodel.EventViewModel
+import androidx.compose.runtime.collectAsState
+import kotlinx.coroutines.launch
+import com.luckydut97.tennispark_tablet.data.network.ApiProvider
 
 data class TabletBannerSlot(
     val title: String,
@@ -51,10 +48,16 @@ fun TabletEventScreen(
     onNavigateToEvent: () -> Unit,
     onNavigateToSettings: () -> Unit
 ) {
+    val eventRepository = remember { EventRepository(ApiProvider.eventService) }
+    val eventViewModel = remember { EventViewModel(eventRepository) }
+    val events by eventViewModel.eventList.collectAsState()
+    val isLoading by eventViewModel.isLoading.collectAsState()
+    val errorMessage by eventViewModel.errorMessage.collectAsState()
+
     var showEventDialog by remember { mutableStateOf(false) }
     var showEditDialog by rememberSaveable { mutableStateOf(false) }
     var showGameDialog by remember { mutableStateOf(false) }
-    var selectedEvent by rememberSaveable { mutableStateOf<TabletEventItem?>(null) }
+    var selectedEvent by rememberSaveable { mutableStateOf<EventItem?>(null) }
 
     val bannerSlots = remember {
         listOf(
@@ -65,15 +68,11 @@ fun TabletEventScreen(
         )
     }
 
-    val eventItems = remember {
-        listOf(
-            TabletEventItem("이벤트 만들기", 100),
-            TabletEventItem("출석 체크", 100)
-        )
-    }
-
-    // 네비게이션바 높이 고려
     val navBarHeight = 110.dp
+
+    LaunchedEffect(Unit) {
+        eventViewModel.fetchEvents()
+    }
 
     Box(
         modifier = Modifier
@@ -180,9 +179,9 @@ fun TabletEventScreen(
                     modifier = Modifier.fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    eventItems.forEach { event ->
+                    events.forEach { event ->
                         EventCard(
-                            event = event,
+                            event = TabletEventItem(event.title, event.point), // 혹은 필요하면 확장
                             onClick = {
                                 selectedEvent = event
                                 showEditDialog = true
@@ -282,7 +281,7 @@ fun TabletEventScreen(
         EventCreateBottomSheet(
             onDismiss = { showEventDialog = false },
             onConfirm = { name, content, points ->
-                // Handle event creation
+                eventViewModel.createEvent(name, content, points)
                 showEventDialog = false
             }
         )
@@ -291,14 +290,14 @@ fun TabletEventScreen(
     // Event Edit Dialog
     if (showEditDialog && selectedEvent != null) {
         EventEditBottomSheet(
-            event = selectedEvent!!,
+            event = TabletEventItem(selectedEvent!!.title, selectedEvent!!.point),
             onDismiss = { showEditDialog = false },
             onDelete = {
-                // Handle event deletion
+                eventViewModel.deleteEvent(selectedEvent!!.id)
                 showEditDialog = false
             },
             onUpdate = { name, content, points ->
-                // Handle event update
+                eventViewModel.updateEvent(selectedEvent!!.id, name, content, points)
                 showEditDialog = false
             }
         )
