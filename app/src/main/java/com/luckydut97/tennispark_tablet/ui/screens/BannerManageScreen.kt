@@ -1,16 +1,23 @@
 package com.luckydut97.tennispark_tablet.ui.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.luckydut97.tennispark_tablet.ui.components.TabletTopBar
 import com.luckydut97.tennispark_tablet.ui.components.BannerManageItem
 import com.luckydut97.tennispark_tablet.ui.components.BannerItemUiState
@@ -79,27 +86,68 @@ fun BannerManageScreen(
 
     // 삭제 확인 다이얼로그
     if (showDeleteDialogFor != null) {
-        AlertDialog(
-            onDismissRequest = { showDeleteDialogFor = null },
-            title = { Text("광고 삭제") },
-            text = { Text("광고를 삭제하시겠습니까?") },
-            confirmButton = {
-                Button(onClick = {
-                    bannerStates = bannerStates.mapIndexed { i, item ->
-                        if (i == showDeleteDialogFor)
-                            BannerItemUiState()
-                        else item
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.5f))
+                .clickable { showDeleteDialogFor = null },
+            contentAlignment = Alignment.Center
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(width = 354.dp, height = 186.dp)
+                    .background(Color.White, RoundedCornerShape(12.dp))
+                    .padding(24.dp)
+                    .clickable { /* 내부 클릭 시 아무것도 하지 않음 */ },
+                contentAlignment = Alignment.Center
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    Text(
+                        text = "광고 삭제",
+                        fontSize = 22.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Black,
+                        textAlign = TextAlign.Center
+                    )
+
+                    Text(
+                        text = "광고를 삭제하시겠습니까?",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = Color(0xFF787878),
+                        textAlign = TextAlign.Center
+                    )
+
+                    Spacer(modifier = Modifier.height(2.dp))
+
+                    Button(
+                        onClick = {
+                            bannerStates = bannerStates.mapIndexed { i, item ->
+                                if (i == showDeleteDialogFor)
+                                    BannerItemUiState()
+                                else item
+                            }
+                            showDeleteDialogFor = null
+                        },
+                        modifier = Modifier.size(width = 309.dp, height = 55.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFF145F44),
+                            contentColor = Color.White
+                        ),
+                        shape = RoundedCornerShape(5.dp)
+                    ) {
+                        Text(
+                            text = "확인",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            textAlign = TextAlign.Center
+                        )
                     }
-                    showDeleteDialogFor = null
-                }) {
-                    Text("확인")
-                }
-            },
-            dismissButton = {
-                Button(onClick = { showDeleteDialogFor = null }) {
-                    Text("취소")
                 }
             }
-        )
+        }
     }
 }
