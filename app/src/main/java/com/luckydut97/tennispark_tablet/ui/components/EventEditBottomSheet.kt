@@ -28,7 +28,7 @@ fun EventEditBottomSheet(
     onUpdate: (String, String, String) -> Unit
 ) {
     var eventName by remember { mutableStateOf(event.title) }
-    var eventContent by remember { mutableStateOf("수동공고 A코트") } // 예시 텍스트
+    var eventContent by remember { mutableStateOf(event.content) }
     var eventPoints by remember { mutableStateOf(event.points.toString()) }
 
     Box(

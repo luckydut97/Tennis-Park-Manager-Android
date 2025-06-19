@@ -20,10 +20,9 @@ import com.luckydut97.tennispark_tablet.R
 import com.luckydut97.tennispark_tablet.ui.components.BottomNavigationBar
 import com.luckydut97.tennispark_tablet.ui.components.CheckInCardPager
 import com.luckydut97.tennispark_tablet.ui.theme.*
-import com.luckydut97.tennispark_tablet.data.network.ActivityResponse
+import com.luckydut97.tennispark_tablet.data.repository.EventRepository
 import com.luckydut97.tennispark_tablet.data.network.ApiProvider
-import com.luckydut97.tennispark_tablet.data.repository.ActivityRepository
-import com.luckydut97.tennispark_tablet.ui.viewmodel.ActivityViewModel
+import com.luckydut97.tennispark_tablet.ui.viewmodel.EventViewModel
 import androidx.compose.runtime.collectAsState
 
 @Composable
@@ -57,12 +56,13 @@ fun MainScreen(
     onNavigateToSettings: () -> Unit
 ) {
     // ViewModel 생성 및 데이터 가져오기
-    val activityViewModel = remember { ActivityViewModel(ActivityRepository(ApiProvider.activityService)) }
-    val activityList: List<ActivityResponse> = activityViewModel.activityList.collectAsState(initial = emptyList()).value
-    
-    // 활동 목록 새로고침
-    LaunchedEffect(Unit) { 
-        activityViewModel.refreshActivities() 
+    val eventRepository = remember { EventRepository(ApiProvider.eventService) }
+    val eventViewModel = remember { EventViewModel(eventRepository) }
+    val events by eventViewModel.eventList.collectAsState()
+
+    // 이벤트 목록 새로고침
+    LaunchedEffect(Unit) {
+        eventViewModel.fetchEvents()
     }
 
     val configuration = LocalConfiguration.current
@@ -91,8 +91,8 @@ fun MainScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center // 중앙 정렬 추가
         ) {
-            // 체크인 카드 영역 - 활동 목록 전달
-            CheckInCardPager(activities = activityList)
+            // 체크인 카드 영역 - 이벤트 목록 전달
+            CheckInCardPager(events = events)
 
             // 카드와 로고 사이 여백
             Spacer(modifier = Modifier.height(40.dp)) // 30dp에서 40dp로 증가

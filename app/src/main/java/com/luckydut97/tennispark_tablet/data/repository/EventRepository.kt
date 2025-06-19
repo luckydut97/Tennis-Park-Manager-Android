@@ -54,6 +54,15 @@ class EventRepository(
                 Log.e("EVENT 디버깅:", "이벤트 등록 에러: ${res.error}")
                 Result.failure(Exception(res.error?.message ?: "이벤트 등록 실패"))
             }
+        } catch (e: retrofit2.HttpException) {
+            Log.e("EVENT 디버깅:", "이벤트 등록 HTTP 에러 - 코드: ${e.code()}")
+            try {
+                val errorBody = e.response()?.errorBody()?.string()
+                Log.e("EVENT 디버깅:", "이벤트 등록 HTTP 에러 응답 본문: $errorBody")
+            } catch (ex: Exception) {
+                Log.e("EVENT 디버깅:", "에러 응답 본문 읽기 실패", ex)
+            }
+            Result.failure(e)
         } catch (e: Exception) {
             Log.e("EVENT 디버깅:", "이벤트 등록 API 호출 예외", e)
             Result.failure(e)

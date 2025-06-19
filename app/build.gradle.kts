@@ -52,6 +52,9 @@ dependencies {
     // AppCompat 추가 - 다크모드 제어용
     implementation("androidx.appcompat:appcompat:1.6.1")
 
+    // Coil for image loading in Compose
+    implementation("io.coil-kt:coil-compose:2.4.0")
+
     // Extended Icons 추가 - DirectionsRun 등 추가 아이콘 사용 가능
     implementation("androidx.compose.material:material-icons-extended:1.5.8")
     implementation("androidx.navigation:navigation-compose:2.7.7")

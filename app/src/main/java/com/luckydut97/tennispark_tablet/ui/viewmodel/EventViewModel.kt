@@ -31,8 +31,8 @@ class EventViewModel(
             .onFailure { _errorMessage.value = it.message ?: "네트워크 오류" }
     }
 
-    fun createEvent(title: String, content: String, point: String, imageUrl: String? = null) = viewModelScope.launch {
-        Log.d("EVENT 디버깅:", "[등록 버튼 클릭] title=$title, content=$content, point=$point, imageUrl=$imageUrl")
+    fun createEvent(title: String, content: String, point: String) = viewModelScope.launch {
+        Log.d("EVENT 디버깅:", "[등록 버튼 클릭] title=$title, content=$content, point=$point")
         _isLoading.value = true
         if (title.isBlank() || content.isBlank() || point.isBlank() || point.toIntOrNull() == null || point.toIntOrNull()!! <= 0) {
             Log.e("EVENT 디버깅:", "[등록 필수값 누락] title=$title, content=$content, point=$point")
@@ -40,14 +40,15 @@ class EventViewModel(
             _isLoading.value = false
             return@launch
         }
-        val body = EventRequest(title, content, point.toIntOrNull() ?: 0, imageUrl ?: "")
+        val body = EventRequest(title, content, point.toIntOrNull() ?: 0)
         val result = eventRepository.createEvent(Constants.ACCESS_TOKEN, body)
         _isLoading.value = false
         if (result.isSuccess) fetchEvents() else _errorMessage.value = result.exceptionOrNull()?.message ?: "등록 실패"
     }
 
-    fun updateEvent(id: Long, title: String, content: String, point: String, imageUrl: String? = null) = viewModelScope.launch {
-        Log.d("EVENT 디버깅:", "[수정 버튼 클릭] id=$id, title=$title, content=$content, point=$point, imageUrl=$imageUrl")
+    fun updateEvent(id: Long, title: String, content: String, point: String) =
+        viewModelScope.launch {
+            Log.d("EVENT 디버깅:", "[수정 버튼 클릭] id=$id, title=$title, content=$content, point=$point")
         _isLoading.value = true
         if (title.isBlank() || content.isBlank() || point.isBlank() || point.toIntOrNull() == null || point.toIntOrNull()!! <= 0) {
             Log.e("EVENT 디버깅:", "[수정 필수값 누락] id=$id, title=$title, content=$content, point=$point")
@@ -55,7 +56,7 @@ class EventViewModel(
             _isLoading.value = false
             return@launch
         }
-        val body = EventRequest(title, content, point.toIntOrNull() ?: 0, imageUrl ?: "")
+        val body = EventRequest(title, content, point.toIntOrNull() ?: 0)
         val result = eventRepository.updateEvent(Constants.ACCESS_TOKEN, id, body)
         _isLoading.value = false
         if (result.isSuccess) fetchEvents() else _errorMessage.value = result.exceptionOrNull()?.message ?: "수정 실패"

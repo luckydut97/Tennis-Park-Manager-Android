@@ -18,25 +18,29 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.layout.ContentScale
+import coil.compose.AsyncImage
 import com.luckydut97.tennispark_tablet.ui.theme.*
-import com.luckydut97.tennispark_tablet.data.network.ActivityResponse
+import com.luckydut97.tennispark_tablet.data.network.event.EventItem
 
-data class CheckInLocation(
-    val name: String,
-    val court: String
+data class CheckInEvent(
+    val title: String,
+    val content: String,
+    val points: Int,
+    val imageUrl: String?
 )
 
 @OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
 @Composable
-fun CheckInCardPager(activities: List<ActivityResponse> = emptyList()) {
+fun CheckInCardPager(events: List<EventItem> = emptyList()) {
     // API 데이터가 없으면 기본 데이터 사용
-    val locations = if (activities.isEmpty()) {
+    val eventItems = if (events.isEmpty()) {
         listOf(
-            CheckInLocation("활동을 등록해주세요", "!")
+            CheckInEvent("이벤트를 등록해주세요", "이벤트 등록 후 참여 가능합니다", 0, null)
         )
     } else {
-        activities.map { activity ->
-            CheckInLocation(activity.placeName, activity.courtName)
+        events.map { event ->
+            CheckInEvent(event.title, event.content, event.point, event.imageUrl)
         }
     }
 
@@ -49,7 +53,7 @@ fun CheckInCardPager(activities: List<ActivityResponse> = emptyList()) {
     val cardHeight = (screenHeight * 0.58f).coerceAtMost(900.dp).coerceAtLeast(700.dp)
     val horizontalPadding = ((screenWidth - cardWidth) / 2).coerceAtLeast(20.dp)
 
-    val pagerState = rememberPagerState(pageCount = { locations.size })
+    val pagerState = rememberPagerState(pageCount = { eventItems.size })
 
     HorizontalPager(
         state = pagerState,
@@ -60,7 +64,7 @@ fun CheckInCardPager(activities: List<ActivityResponse> = emptyList()) {
         pageSpacing = (screenWidth * 0.05f).coerceAtLeast(20.dp).coerceAtMost(70.dp)
     ) { page ->
         CheckInCard(
-            location = locations[page],
+            event = eventItems[page],
             cardWidth = cardWidth,
             cardHeight = cardHeight
         )
@@ -69,25 +73,31 @@ fun CheckInCardPager(activities: List<ActivityResponse> = emptyList()) {
 
 @Composable
 fun CheckInCard(
-    location: CheckInLocation,
+    event: CheckInEvent,
     cardWidth: androidx.compose.ui.unit.Dp = 474.dp,
     cardHeight: androidx.compose.ui.unit.Dp = 850.dp
 ) {
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp.dp
 
+    // ========== 크기 조절 변수들 (여기서 한 번에 조절 가능) ==========
+    val qrBoxSizeRatio = 0.65f           // QR 박스 크기 비율 (카드 너비 대비)
+    val eventBoxHeightRatio = 0.09f      // 이벤트 내용 박스 높이 비율 (카드 높이 대비)
+
+    // 계산된 크기들
+    val qrBoxSize = (cardWidth * qrBoxSizeRatio).coerceAtLeast(300.dp).coerceAtMost(400.dp)
+    val eventBoxHeight = (cardHeight * eventBoxHeightRatio).coerceAtLeast(55.dp)
+    // ===============================================================
+
     // 반응형 폰트 크기 계산 - 모든 폰트 크기 증가
     val titleFontSize = (screenWidth.value * 0.025f).coerceAtLeast(28f).coerceAtMost(38f).sp
     val descriptionFontSize = (screenWidth.value * 0.014f).coerceAtLeast(18f).coerceAtMost(22f).sp
-    val locationFontSize = (screenWidth.value * 0.014f).coerceAtLeast(18f).coerceAtMost(22f).sp
-    val courtFontSize = (screenWidth.value * 0.017f).coerceAtLeast(20f).coerceAtMost(26f).sp
+    val eventNameFontSize = (screenWidth.value * 0.014f).coerceAtLeast(18f).coerceAtMost(22f).sp
+    val pointsFontSize = (screenWidth.value * 0.017f).coerceAtLeast(20f).coerceAtMost(26f).sp
     val qrTextFontSize = (screenWidth.value * 0.014f).coerceAtLeast(18f).coerceAtMost(22f).sp
 
     // 반응형 패딩 및 크기 - 여백도 조금 증가
     val cardPadding = (cardWidth.value * 0.09f).coerceAtLeast(28f).coerceAtMost(44f).dp
-    val locationBoxWidth = (cardWidth * 0.65f).coerceAtLeast(250.dp)
-    val locationBoxHeight = (cardHeight * 0.09f).coerceAtLeast(55.dp)
-    val qrBoxSize = (cardWidth * 0.65f).coerceAtLeast(300.dp).coerceAtMost(400.dp)
 
     Card(
         modifier = Modifier
@@ -108,7 +118,7 @@ fun CheckInCard(
         ) {
             // Title
             Text(
-                text = "출석 체크",
+                text = event.title,
                 fontSize = titleFontSize,
                 fontWeight = FontWeight.Bold,
                 color = Color.Black,
@@ -118,10 +128,10 @@ fun CheckInCard(
             // Description with styled text
             val annotatedText = buildAnnotatedString {
                 withStyle(style = SpanStyle(color = Color(0xFF555555))) {
-                    append("이용하려는 시설의 QR 코드로 체크인하면\n")
+                    append("이벤트에 참여 하시면\n")
                 }
                 withStyle(style = SpanStyle(color = Color(0xFF555555), fontWeight = FontWeight.Bold)) {
-                    append("100 Point")
+                    append("${event.points} Point")
                 }
                 withStyle(style = SpanStyle(color = Color(0xFF555555))) {
                     append(" 지급해드립니다.")
@@ -136,29 +146,28 @@ fun CheckInCard(
                 modifier = Modifier.padding(bottom = (cardHeight * 0.057f).coerceAtLeast(25.dp))
             )
 
-            // Location Info Box
+            // Event Info Box
             Box(
                 modifier = Modifier
-                    .width(locationBoxWidth)
-                    .height(locationBoxHeight)
+                    .width(qrBoxSize)
+                    .height(eventBoxHeight)
                     .background(Color(0xFFF2FAF4), RoundedCornerShape(8.dp)),
                 contentAlignment = Alignment.Center
             ) {
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy((locationBoxWidth * 0.067f).coerceAtLeast(12.dp)),
+                    horizontalArrangement = Arrangement.spacedBy(
+                        (qrBoxSize * 0.067f).coerceAtLeast(
+                            12.dp
+                        )
+                    ),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = location.name,
-                        fontSize = locationFontSize,
+                        text = event.content,
+                        fontSize = eventNameFontSize,
                         fontWeight = FontWeight.Medium,
-                        color = Color.Black
-                    )
-                    Text(
-                        text = location.court,
-                        fontSize = courtFontSize,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.Black
+                        color = Color.Black,
+                        textAlign = TextAlign.Center
                     )
                 }
             }
@@ -172,7 +181,22 @@ fun CheckInCard(
                     .background(Color(0xFFF3F3F3), RoundedCornerShape(12.dp)),
                 contentAlignment = Alignment.Center
             ) {
-                // QR 코드가 여기에 들어갈 예정
+                if (event.imageUrl != null) {
+                    AsyncImage(
+                        model = event.imageUrl,
+                        contentDescription = "QR 코드",
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Fit
+                    )
+                } else {
+                    // QR 이미지가 없을 때 표시할 기본 텍스트
+                    Text(
+                        text = "QR 이미지 없음",
+                        fontSize = 14.sp,
+                        color = Color.Gray,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height((cardHeight * 0.043f).coerceAtLeast(25.dp)))

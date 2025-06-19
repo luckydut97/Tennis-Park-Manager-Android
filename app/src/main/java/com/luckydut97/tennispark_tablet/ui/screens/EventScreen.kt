@@ -39,6 +39,7 @@ data class TabletBannerSlot(
 
 data class TabletEventItem(
     val title: String,
+    val content: String,
     val points: Int
 )
 
@@ -69,8 +70,8 @@ fun TabletEventScreen(
         listOf(
             TabletBannerSlot("메인화면", "(300X100)"),
             TabletBannerSlot("활동신청", "(300X100)"),
-            TabletBannerSlot("구매목록", "(300X50)"),
-            TabletBannerSlot("회원정보", "(300X50)")
+            TabletBannerSlot("구매목록", "(300X100)"),
+            TabletBannerSlot("회원정보", "(300X100)")
         )
     }
 
@@ -206,7 +207,11 @@ fun TabletEventScreen(
                 ) {
                     events.forEach { event ->
                         EventCard(
-                            event = TabletEventItem(event.title, event.point), // 혹은 필요하면 확장
+                            event = TabletEventItem(
+                                event.title,
+                                event.content,
+                                event.point
+                            ), // 혹은 필요하면 확장
                             onClick = {
                                 selectedEvent = event
                                 showEditDialog = true
@@ -315,7 +320,11 @@ fun TabletEventScreen(
     // Event Edit Dialog
     if (showEditDialog && selectedEvent != null) {
         EventEditBottomSheet(
-            event = TabletEventItem(selectedEvent!!.title, selectedEvent!!.point),
+            event = TabletEventItem(
+                selectedEvent!!.title,
+                selectedEvent!!.content,
+                selectedEvent!!.point
+            ),
             onDismiss = { showEditDialog = false },
             onDelete = {
                 eventViewModel.deleteEvent(selectedEvent!!.id)

@@ -14,8 +14,7 @@ data class Event(
     val createdAt: Long = System.currentTimeMillis(),
     val updatedAt: Long = System.currentTimeMillis(),
     val startDate: Long? = null,
-    val endDate: Long? = null,
-    val imageUrl: String? = null
+    val endDate: Long? = null
 ) {
     /**
      * 이벤트가 유효한지 확인
