@@ -87,7 +87,7 @@ fun CheckInCard(
     val cardPadding = (cardWidth.value * 0.09f).coerceAtLeast(28f).coerceAtMost(44f).dp
     val locationBoxWidth = (cardWidth * 0.65f).coerceAtLeast(250.dp)
     val locationBoxHeight = (cardHeight * 0.09f).coerceAtLeast(55.dp)
-    val qrBoxSize = (cardWidth * 0.75f).coerceAtLeast(300.dp).coerceAtMost(400.dp)
+    val qrBoxSize = (cardWidth * 0.65f).coerceAtLeast(300.dp).coerceAtMost(400.dp)
 
     Card(
         modifier = Modifier

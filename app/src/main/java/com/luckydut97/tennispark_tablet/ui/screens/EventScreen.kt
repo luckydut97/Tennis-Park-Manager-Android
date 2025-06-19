@@ -28,6 +28,8 @@ import com.luckydut97.tennispark_tablet.ui.viewmodel.EventViewModel
 import androidx.compose.runtime.collectAsState
 import kotlinx.coroutines.launch
 import com.luckydut97.tennispark_tablet.data.network.ApiProvider
+import com.luckydut97.tennispark_tablet.ui.screens.BannerManageType
+import com.luckydut97.tennispark_tablet.ui.screens.BannerManageScreen
 
 data class TabletBannerSlot(
     val title: String,
@@ -46,7 +48,8 @@ fun TabletEventScreen(
     onNavigateToHome: () -> Unit,
     onNavigateToActivity: () -> Unit,
     onNavigateToEvent: () -> Unit,
-    onNavigateToSettings: () -> Unit
+    onNavigateToSettings: () -> Unit,
+    onNavigateToBannerManage: (BannerManageType) -> Unit = {}
 ) {
     val eventRepository = remember { EventRepository(ApiProvider.eventService) }
     val eventViewModel = remember { EventViewModel(eventRepository) }
@@ -58,6 +61,9 @@ fun TabletEventScreen(
     var showEditDialog by rememberSaveable { mutableStateOf(false) }
     var showGameDialog by remember { mutableStateOf(false) }
     var selectedEvent by rememberSaveable { mutableStateOf<EventItem?>(null) }
+
+    // 배너 관리 화면 상태 추가
+    var currentBannerManageType by remember { mutableStateOf<BannerManageType?>(null) }
 
     val bannerSlots = remember {
         listOf(
@@ -72,6 +78,17 @@ fun TabletEventScreen(
 
     LaunchedEffect(Unit) {
         eventViewModel.fetchEvents()
+    }
+
+    // 배너 관리 화면이 활성화된 경우
+    if (currentBannerManageType != null) {
+        BannerManageScreen(
+            manageType = currentBannerManageType!!,
+            onBack = {
+                currentBannerManageType = null
+            }
+        )
+        return
     }
 
     Box(
@@ -130,13 +147,17 @@ fun TabletEventScreen(
                                 banner = bannerSlots[0],
                                 modifier = Modifier
                                     .weight(1f)
-                                    .height(157.dp)
+                                    .height(157.dp),
+                                onEditClick = { currentBannerManageType = BannerManageType.MAIN }
                             )
                             BannerCard(
                                 banner = bannerSlots[1],
                                 modifier = Modifier
                                     .weight(1f)
-                                    .height(157.dp)
+                                    .height(157.dp),
+                                onEditClick = {
+                                    currentBannerManageType = BannerManageType.ACTIVITY
+                                }
                             )
                         }
                         // 두 번째 행 - 작은 카드들
@@ -148,13 +169,17 @@ fun TabletEventScreen(
                                 banner = bannerSlots[2],
                                 modifier = Modifier
                                     .weight(1f)
-                                    .height(157.dp)
+                                    .height(157.dp),
+                                onEditClick = {
+                                    currentBannerManageType = BannerManageType.PURCHASE
+                                }
                             )
                             BannerCard(
                                 banner = bannerSlots[3],
                                 modifier = Modifier
                                     .weight(1f)
-                                    .height(157.dp)
+                                    .height(157.dp),
+                                onEditClick = { currentBannerManageType = BannerManageType.MEMBER }
                             )
                         }
                     }
@@ -318,7 +343,8 @@ fun TabletEventScreen(
 @Composable
 private fun BannerCard(
     banner: TabletBannerSlot,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onEditClick: () -> Unit
 ) {
     Column(
         modifier = modifier
@@ -347,7 +373,7 @@ private fun BannerCard(
             )
             
             OutlinedButton(
-                onClick = { /* Handle edit */ },
+                onClick = onEditClick,
                 colors = ButtonDefaults.outlinedButtonColors(
                     containerColor = Color.Transparent,
                     contentColor = Color(0xFF08432E)
