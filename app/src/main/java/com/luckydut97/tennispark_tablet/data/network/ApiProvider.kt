@@ -6,6 +6,7 @@ import com.luckydut97.tennispark_tablet.utils.Constants
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import java.util.concurrent.TimeUnit
+import com.luckydut97.tennispark_tablet.data.network.activity.ActivityApiService
 
 object ApiProvider {
     private val loggingInterceptor = HttpLoggingInterceptor { message ->

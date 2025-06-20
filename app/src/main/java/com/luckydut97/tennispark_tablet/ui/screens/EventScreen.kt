@@ -11,9 +11,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.ui.platform.LocalContext
 import com.luckydut97.tennispark_tablet.ui.components.BottomNavigationBar
 import com.luckydut97.tennispark_tablet.ui.components.TabletTopBar
 import com.luckydut97.tennispark_tablet.ui.theme.*
@@ -30,6 +28,10 @@ import kotlinx.coroutines.launch
 import com.luckydut97.tennispark_tablet.data.network.ApiProvider
 import com.luckydut97.tennispark_tablet.ui.screens.BannerManageType
 import com.luckydut97.tennispark_tablet.ui.screens.BannerManageScreen
+import android.widget.Toast
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.ui.tooling.preview.Preview
 
 data class TabletBannerSlot(
     val title: String,
@@ -57,6 +59,7 @@ fun TabletEventScreen(
     val events by eventViewModel.eventList.collectAsState()
     val isLoading by eventViewModel.isLoading.collectAsState()
     val errorMessage by eventViewModel.errorMessage.collectAsState()
+    val context = LocalContext.current
 
     var showEventDialog by remember { mutableStateOf(false) }
     var showEditDialog by rememberSaveable { mutableStateOf(false) }
@@ -102,7 +105,8 @@ fun TabletEventScreen(
                 .fillMaxSize()
                 .background(TennisGreen)
                 .statusBarsPadding()
-                .padding(bottom = navBarHeight) // 네비게이션바 공간 확보
+                .padding(bottom = navBarHeight), // 네비게이션바 공간 확보
+            verticalArrangement = Arrangement.Top
         ) {
             TabletTopBar(title = "이벤트 관리", onBack = onNavigateToHome)
 
@@ -180,7 +184,9 @@ fun TabletEventScreen(
                                 modifier = Modifier
                                     .weight(1f)
                                     .height(157.dp),
-                                onEditClick = { currentBannerManageType = BannerManageType.MEMBER }
+                                onEditClick = {
+                                    currentBannerManageType = BannerManageType.MEMBER
+                                }
                             )
                         }
                     }
@@ -312,6 +318,11 @@ fun TabletEventScreen(
             onDismiss = { showEventDialog = false },
             onConfirm = { name, content, points ->
                 eventViewModel.createEvent(name, content, points)
+                if (errorMessage != null) {
+                    Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
+                } else {
+                    Toast.makeText(context, "이벤트가 등록되었습니다", Toast.LENGTH_SHORT).show()
+                }
                 showEventDialog = false
             }
         )
@@ -457,8 +468,6 @@ private fun EventCard(
         }
     }
 }
-
-
 
 @Preview(showBackground = true, widthDp = 1600, heightDp = 2560)
 @Composable

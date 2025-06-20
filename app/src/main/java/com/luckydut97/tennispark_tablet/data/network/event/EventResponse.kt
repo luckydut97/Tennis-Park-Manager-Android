@@ -1,5 +1,13 @@
 package com.luckydut97.tennispark_tablet.data.network.event
 
+data class EventItem(
+    val id: Long,
+    val title: String,
+    val content: String,
+    val point: Int,
+    val imageUrl: String?
+)
+
 data class ContentPage<T>(
     val content: List<T>,
     val pageable: Any? = null, // 필요한 필드만 추후 추가 (pageNumber 등)

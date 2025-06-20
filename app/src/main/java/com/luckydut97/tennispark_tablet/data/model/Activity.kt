@@ -14,6 +14,7 @@ data class Activity(
     val selectedDays: List<String>,
     val address: String,
     val isRepeating: Boolean,
+    val courtType: String = "GAME", // 코트 타입 추가 (기본값: GAME)
     val createdAt: Long = System.currentTimeMillis(),
     val updatedAt: Long = System.currentTimeMillis(),
     val isActive: Boolean = true
@@ -64,6 +65,7 @@ class ActivityBuilder {
     private var selectedDays: List<String> = emptyList()
     private var address: String = ""
     private var isRepeating: Boolean = false
+    private var courtType: String = "GAME" // 코트 타입 추가 (기본값: GAME)
 
     fun location(location: String) = apply { this.location = location }
     fun court(court: String) = apply { this.court = court }
@@ -72,6 +74,7 @@ class ActivityBuilder {
     fun selectedDays(days: List<String>) = apply { this.selectedDays = days }
     fun address(address: String) = apply { this.address = address }
     fun isRepeating(repeating: Boolean) = apply { this.isRepeating = repeating }
+    fun courtType(type: String) = apply { this.courtType = type }
 
     fun build(): Activity {
         return Activity(
@@ -81,7 +84,8 @@ class ActivityBuilder {
             endTime = endTime,
             selectedDays = selectedDays,
             address = address,
-            isRepeating = isRepeating
+            isRepeating = isRepeating,
+            courtType = courtType
         )
     }
 }

@@ -1,5 +1,6 @@
 package com.luckydut97.tennispark_tablet.ui.screens
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -29,17 +30,19 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.luckydut97.tennispark_tablet.data.model.Activity
+import com.luckydut97.tennispark_tablet.data.network.ApiProvider
+import com.luckydut97.tennispark_tablet.data.repository.ActivityRepository
 import com.luckydut97.tennispark_tablet.ui.components.BottomNavigationBar
 import com.luckydut97.tennispark_tablet.ui.components.TabletTopBar
 import com.luckydut97.tennispark_tablet.ui.screens.ActivityRegistrationScreen
 import com.luckydut97.tennispark_tablet.ui.screens.ApplicationListScreen
 import com.luckydut97.tennispark_tablet.ui.theme.*
-import com.luckydut97.tennispark_tablet.data.network.ActivityResponse
-import com.luckydut97.tennispark_tablet.data.network.ApiProvider
-import com.luckydut97.tennispark_tablet.data.repository.ActivityRepository
 import com.luckydut97.tennispark_tablet.ui.viewmodel.ActivityViewModel
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
+import kotlinx.coroutines.launch
 
 // 시간 문자열을 HH:mm 형식으로 잘라주는 확장함수(임시)
 fun String.formatToHHmm(): String = if (this.length >= 5) this.substring(0, 5) else this
@@ -54,14 +57,16 @@ fun TabletActivityScreen(
     onNavigateToSettings: () -> Unit
 ) {
     // ViewModel을 공통으로 생성(이 인스턴스 하나를 하위 등록화면에도 넘김)
-    val activityViewModel = remember { ActivityViewModel(ActivityRepository(ApiProvider.activityService)) }
-    val activityList: List<ActivityResponse> = activityViewModel.activityList.collectAsState(initial = emptyList()).value
+    val activityViewModel =
+        remember { ActivityViewModel(ActivityRepository(ApiProvider.activityService)) }
+    val activityList: List<Activity> =
+        activityViewModel.activityList.collectAsState(initial = emptyList()).value
     LaunchedEffect(Unit) { activityViewModel.refreshActivities() }
 
     var currentTab by remember { mutableStateOf("활동 등록") }
     var showRegistrationScreen by remember { mutableStateOf(false) }
     var showApplicationListScreen by remember { mutableStateOf(false) }
-    var editingActivity by remember { mutableStateOf<ActivityResponse?>(null) }
+    var editingActivity by remember { mutableStateOf<Activity?>(null) }
 
     // 네비게이션바 높이 고려
     val navBarHeight = 110.dp
@@ -191,7 +196,8 @@ fun TabletActivityScreen(
                             onEditClick = { activity ->
                                 editingActivity = activity
                                 showRegistrationScreen = true
-                            }
+                            },
+                            activityViewModel = activityViewModel
                         )
                     } else {
                         TabletApplicationContent {
@@ -223,9 +229,10 @@ fun TabletActivityScreen(
 
 @Composable
 private fun TabletActivityListContent(
-    activities: List<ActivityResponse>,
+    activities: List<Activity>,
     onAddClick: () -> Unit,
-    onEditClick: (ActivityResponse) -> Unit
+    onEditClick: (Activity) -> Unit,
+    activityViewModel: ActivityViewModel
 ) {
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -239,7 +246,11 @@ private fun TabletActivityListContent(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             items(activities) { activity ->
-                TabletActivityCard(activity = activity, onEditClick = { onEditClick(activity) })
+                TabletActivityCard(
+                    activity = activity,
+                    onEditClick = { onEditClick(activity) },
+                    activityViewModel = activityViewModel
+                )
             }
             item {
                 Spacer(modifier = Modifier.height(100.dp)) // Add space for FAB
@@ -266,7 +277,14 @@ private fun TabletActivityListContent(
 }
 
 @Composable
-private fun TabletActivityCard(activity: ActivityResponse, onEditClick: () -> Unit) {
+private fun TabletActivityCard(
+    activity: Activity,
+    onEditClick: () -> Unit,
+    activityViewModel: ActivityViewModel
+) {
+    val scope = rememberCoroutineScope()
+    val context = LocalContext.current
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -279,76 +297,113 @@ private fun TabletActivityCard(activity: ActivityResponse, onEditClick: () -> Un
             modifier = Modifier
                 .fillMaxSize()
                 .padding(horizontal = 30.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
+            horizontalArrangement = Arrangement.spacedBy(16.dp), // 모든 간격을 16dp로 통일
             verticalAlignment = Alignment.CenterVertically
         ) {
+            // 왼쪽: 장소명 + 코트명 (각각 고정 구역, 다른 정렬)
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(16.dp), // 활동명-코트명 간격 16dp
+                modifier = Modifier
+                    .weight(1f, fill = false) // 필요한 만큼만 공간 사용
+                    .widthIn(min = 200.dp, max = 400.dp) // 최소/최대 너비 제한
             ) {
-                Text(
-                    text = activity.placeName,
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = Color.Black
-                )
-                Text(
-                    text = activity.courtName,
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.Black
-                )
+                // 활동명 구역 - 좌측 정렬
+                Box(
+                    modifier = Modifier
+                        .weight(2f) // 활동명이 코트명보다 더 많은 공간 할당
+                        .widthIn(min = 120.dp),
+                    contentAlignment = Alignment.CenterStart // 좌측 정렬
+                ) {
+                    Text(
+                        text = activity.location,
+                        fontSize = 22.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = Color.Black,
+                        maxLines = 1,
+                        overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                        textAlign = TextAlign.Start // 좌측 정렬
+                    )
+                }
+
+                // 코트명 구역 - 가운데 정렬
+                Box(
+                    modifier = Modifier
+                        .weight(1f) // 코트명은 상대적으로 적은 공간
+                        .widthIn(min = 80.dp),
+                    contentAlignment = Alignment.Center // 가운데 정렬
+                ) {
+                    Text(
+                        text = activity.court,
+                        fontSize = 22.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Black,
+                        maxLines = 1,
+                        overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                        textAlign = TextAlign.Center // 가운데 정렬
+                    )
+                }
             }
 
+            // 시간 표시 (단독 구역)
+            Text(
+                text = "${activity.startTime} ~ ${activity.endTime}",
+                fontSize = 22.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.Black,
+                maxLines = 1,
+                modifier = Modifier.widthIn(min = 145.dp) // 시간 표시 최소 너비 확보
+            )
+
+            // 버튼 구역 (수정, 삭제)
             Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
+                horizontalArrangement = Arrangement.spacedBy(8.dp) // 버튼 간 간격은 8dp 유지
             ) {
-                Text(
-                    text = "${activity.beginAt.formatToHHmm()} ~ ${activity.endAt.formatToHHmm()}",
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.Black
-                )
-
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                OutlinedButton(
+                    onClick = onEditClick,
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        containerColor = Color.Transparent,
+                        contentColor = Color(0xFF08432E)
+                    ),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF08432E)),
+                    shape = RoundedCornerShape(8.dp),
+                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                    modifier = Modifier.size(102.dp, 46.dp)
                 ) {
-                    OutlinedButton(
-                        onClick = onEditClick,
-                        colors = ButtonDefaults.outlinedButtonColors(
-                            containerColor = Color.Transparent,
-                            contentColor = Color(0xFF08432E)
-                        ),
-                        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF08432E)),
-                        shape = RoundedCornerShape(8.dp),
-                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                        modifier = Modifier.size(102.dp, 46.dp)
-                    ) {
-                        Text(
-                            text = "수정",
-                            fontSize = 22.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
+                    Text(
+                        text = "수정",
+                        fontSize = 22.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
 
-                    OutlinedButton(
-                        onClick = { /* Handle delete */ },
-                        colors = ButtonDefaults.outlinedButtonColors(
-                            containerColor = Color.Transparent,
-                            contentColor = Color(0xFF08432E)
-                        ),
-                        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF08432E)),
-                        shape = RoundedCornerShape(8.dp),
-                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                        modifier = Modifier.size(102.dp, 46.dp)
-                    ) {
-                        Text(
-                            text = "삭제",
-                            fontSize = 22.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
+                OutlinedButton(
+                    onClick = {
+                        scope.launch {
+                            val result = activityViewModel.deleteActivity(activity.id)
+                            if (result) {
+                                Toast.makeText(context, "활동이 삭제되었습니다", Toast.LENGTH_SHORT)
+                                    .show()
+                            } else {
+                                Toast.makeText(context, "활동 삭제에 실패했습니다", Toast.LENGTH_SHORT)
+                                    .show()
+                            }
+                        }
+                    },
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        containerColor = Color.Transparent,
+                        contentColor = Color(0xFF08432E)
+                    ),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF08432E)),
+                    shape = RoundedCornerShape(8.dp),
+                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                    modifier = Modifier.size(102.dp, 46.dp)
+                ) {
+                    Text(
+                        text = "삭제",
+                        fontSize = 22.sp,
+                        fontWeight = FontWeight.Bold
+                    )
                 }
             }
         }
@@ -375,256 +430,6 @@ private fun TabletApplicationContent(onCardClick: () -> Unit) {
         item {
             Spacer(modifier = Modifier.height(40.dp)) // Bottom spacing for navigation bar
         }
-    }
-}
-
-@Composable
-private fun TabletActivityFormCard() {
-    var startTime by remember { mutableStateOf("12:00") }
-    var endTime by remember { mutableStateOf("14:00") }
-    var selectedDays by remember { mutableStateOf(setOf("토")) }
-    var location by remember { mutableStateOf("수도권 테니스장") }
-    var address by remember { mutableStateOf("서울 강남구 개포로 410 수도전기공고등학교") }
-    var isRepeating by remember { mutableStateOf(true) }
-    var maxParticipants by remember { mutableStateOf(12) }
-
-    val weekDays = listOf("일", "월", "화", "수", "목", "금", "토")
-
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(containerColor = White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
-    ) {
-        Column(
-            modifier = Modifier.padding(40.dp),
-            verticalArrangement = Arrangement.spacedBy(32.dp)
-        ) {
-            // Time Selection
-            Text(
-                text = "활동 시간 선택 (활동 시작시간 ~ 종료시간)",
-                fontSize = 18.sp,
-                color = TennisGreen,
-                fontWeight = FontWeight.Bold
-            )
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(20.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                OutlinedTextField(
-                    value = startTime,
-                    onValueChange = { startTime = it },
-                    modifier = Modifier.weight(1f),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = TennisGreen,
-                        unfocusedBorderColor = TennisLightGreen,
-                        focusedContainerColor = TennisVeryLightGreen,
-                        unfocusedContainerColor = TennisVeryLightGreen
-                    ),
-                    shape = RoundedCornerShape(12.dp),
-                    textStyle = LocalTextStyle.current.copy(fontSize = 18.sp)
-                )
-
-                Text(
-                    text = "~",
-                    fontSize = 24.sp,
-                    color = TennisGreen,
-                    fontWeight = FontWeight.Bold
-                )
-
-                OutlinedTextField(
-                    value = endTime,
-                    onValueChange = { endTime = it },
-                    modifier = Modifier.weight(1f),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = TennisGreen,
-                        unfocusedBorderColor = TennisLightGreen,
-                        focusedContainerColor = TennisVeryLightGreen,
-                        unfocusedContainerColor = TennisVeryLightGreen
-                    ),
-                    shape = RoundedCornerShape(12.dp),
-                    textStyle = LocalTextStyle.current.copy(fontSize = 18.sp)
-                )
-            }
-
-            // Day Selection
-            Text(
-                text = "활동 요일 선택",
-                fontSize = 18.sp,
-                color = TennisGreen,
-                fontWeight = FontWeight.Bold
-            )
-
-            LazyRow(
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                items(weekDays) { day ->
-                    TabletDayButton(
-                        day = day,
-                        selected = selectedDays.contains(day),
-                        onClick = {
-                            selectedDays = if (selectedDays.contains(day)) {
-                                selectedDays - day
-                            } else {
-                                selectedDays + day
-                            }
-                        }
-                    )
-                }
-            }
-
-            // Location
-            Text(
-                text = "운동 장소",
-                fontSize = 18.sp,
-                color = TennisGreen,
-                fontWeight = FontWeight.Bold
-            )
-
-            OutlinedTextField(
-                value = location,
-                onValueChange = { location = it },
-                modifier = Modifier.fillMaxWidth(),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = TennisGreen,
-                    unfocusedBorderColor = TennisLightGreen,
-                    focusedContainerColor = TennisVeryLightGreen,
-                    unfocusedContainerColor = TennisVeryLightGreen
-                ),
-                shape = RoundedCornerShape(12.dp),
-                textStyle = LocalTextStyle.current.copy(fontSize = 18.sp)
-            )
-
-            // Address
-            Text(
-                text = "주소",
-                fontSize = 18.sp,
-                color = TennisGreen,
-                fontWeight = FontWeight.Bold
-            )
-
-            OutlinedTextField(
-                value = address,
-                onValueChange = { address = it },
-                modifier = Modifier.fillMaxWidth(),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = TennisGreen,
-                    unfocusedBorderColor = TennisLightGreen,
-                    focusedContainerColor = TennisVeryLightGreen,
-                    unfocusedContainerColor = TennisVeryLightGreen
-                ),
-                shape = RoundedCornerShape(12.dp),
-                textStyle = LocalTextStyle.current.copy(fontSize = 18.sp)
-            )
-
-            // Max Participants
-            Text(
-                text = "최대 인원",
-                fontSize = 18.sp,
-                color = TennisGreen,
-                fontWeight = FontWeight.Bold
-            )
-
-            OutlinedTextField(
-                value = maxParticipants.toString(),
-                onValueChange = {
-                    if (it.isNotBlank()) {
-                        maxParticipants = it.toIntOrNull() ?: 12
-                    }
-                },
-                modifier = Modifier.fillMaxWidth(),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = TennisGreen,
-                    unfocusedBorderColor = TennisLightGreen,
-                    focusedContainerColor = TennisVeryLightGreen,
-                    unfocusedContainerColor = TennisVeryLightGreen
-                ),
-                shape = RoundedCornerShape(12.dp),
-                textStyle = LocalTextStyle.current.copy(fontSize = 18.sp)
-            )
-
-            // Repeat Options
-            Text(
-                text = "일정 반복여부",
-                fontSize = 18.sp,
-                color = TennisGreen,
-                fontWeight = FontWeight.Bold
-            )
-
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                TabletRepeatButton(
-                    text = "반복",
-                    selected = isRepeating,
-                    onClick = { isRepeating = true },
-                    modifier = Modifier.weight(1f)
-                )
-                TabletRepeatButton(
-                    text = "반복 안 함",
-                    selected = !isRepeating,
-                    onClick = { isRepeating = false },
-                    modifier = Modifier.weight(1f)
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun TabletDayButton(
-    day: String,
-    selected: Boolean,
-    onClick: () -> Unit
-) {
-    Box(
-        modifier = Modifier
-            .size(60.dp)
-            .clip(RoundedCornerShape(12.dp))
-            .background(
-                if (selected) White else Color.Transparent
-            )
-            .border(
-                2.dp,
-                if (selected) TennisGreen else TennisLightGreen,
-                RoundedCornerShape(12.dp)
-            )
-            .clickable { onClick() },
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = day,
-            fontSize = 18.sp,
-            color = if (selected) TennisGreen else White,
-            fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal
-        )
-    }
-}
-
-@Composable
-private fun TabletRepeatButton(
-    text: String,
-    selected: Boolean,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Button(
-        onClick = onClick,
-        modifier = modifier.height(60.dp),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = if (selected) White else Color.Transparent,
-            contentColor = if (selected) TennisGreen else TennisGreen
-        ),
-        shape = RoundedCornerShape(12.dp),
-        border = androidx.compose.foundation.BorderStroke(2.dp, TennisGreen)
-    ) {
-        Text(
-            text = text,
-            fontSize = 16.sp,
-            fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal
-        )
     }
 }
 

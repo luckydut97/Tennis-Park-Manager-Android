@@ -5,11 +5,3 @@ data class EventRequest(
     val content: String,
     val point: Int
 )
-
-data class EventItem(
-    val id: Long,
-    val title: String,
-    val content: String,
-    val point: Int,
-    val imageUrl: String?
-)

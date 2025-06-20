@@ -8,6 +8,7 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.google.gson.JsonElement
 import com.luckydut97.tennispark_tablet.utils.Constants
+import retrofit2.HttpException
 
 class EventRepository(
     private val api: EventApiService
@@ -52,17 +53,36 @@ class EventRepository(
                 Result.success(Unit)
             } else {
                 Log.e("EVENT 디버깅:", "이벤트 등록 에러: ${res.error}")
-                Result.failure(Exception(res.error?.message ?: "이벤트 등록 실패"))
+                val errorMessage = res.error?.message ?: "이벤트 등록 실패"
+                Result.failure(Exception(errorMessage))
             }
-        } catch (e: retrofit2.HttpException) {
+        } catch (e: HttpException) {
             Log.e("EVENT 디버깅:", "이벤트 등록 HTTP 에러 - 코드: ${e.code()}")
             try {
                 val errorBody = e.response()?.errorBody()?.string()
                 Log.e("EVENT 디버깅:", "이벤트 등록 HTTP 에러 응답 본문: $errorBody")
+
+                // 에러 응답 파싱해서 구체적인 메시지 추출
+                val errorMessage = if (errorBody != null) {
+                    try {
+                        val gson = Gson()
+                        val errorResponse = gson.fromJson(
+                            errorBody,
+                            com.luckydut97.tennispark_tablet.data.network.ApiResponse::class.java
+                        )
+                        errorResponse.error?.message ?: "이벤트 등록 실패"
+                    } catch (parseException: Exception) {
+                        "이벤트 등록 실패 (${e.code()})"
+                    }
+                } else {
+                    "이벤트 등록 실패 (${e.code()})"
+                }
+
+                Result.failure(Exception(errorMessage))
             } catch (ex: Exception) {
                 Log.e("EVENT 디버깅:", "에러 응답 본문 읽기 실패", ex)
+                Result.failure(Exception("이벤트 등록 실패 (${e.code()})"))
             }
-            Result.failure(e)
         } catch (e: Exception) {
             Log.e("EVENT 디버깅:", "이벤트 등록 API 호출 예외", e)
             Result.failure(e)

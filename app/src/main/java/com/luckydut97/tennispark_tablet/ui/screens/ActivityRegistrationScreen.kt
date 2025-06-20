@@ -17,18 +17,18 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import com.luckydut97.tennispark_tablet.ui.components.BottomNavigationBar
-import com.luckydut97.tennispark_tablet.ui.components.TabletTopBar
-import com.luckydut97.tennispark_tablet.ui.theme.*
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.ui.platform.LocalView
+import com.luckydut97.tennispark_tablet.ui.components.BottomNavigationBar
+import com.luckydut97.tennispark_tablet.ui.components.TabletTopBar
+import com.luckydut97.tennispark_tablet.ui.theme.*
+import androidx.compose.ui.platform.LocalContext
 import com.luckydut97.tennispark_tablet.ui.viewmodel.ActivityViewModel
-import com.luckydut97.tennispark_tablet.data.network.ActivityRegisterRequest
-import com.luckydut97.tennispark_tablet.data.network.ActivityResponse
+import com.luckydut97.tennispark_tablet.data.model.Activity
 import kotlinx.coroutines.launch
 import android.widget.Toast
-import androidx.compose.ui.platform.LocalContext
+import com.luckydut97.tennispark_tablet.data.network.activity.ActivityRegisterRequest
 
 // ... existing code ...
 import com.luckydut97.tennispark_tablet.ui.screens.formatToHHmm
@@ -43,34 +43,40 @@ fun ActivityRegistrationScreen(
     onNavigateToSettings: () -> Unit,
     onNavigateBack: () -> Unit,
     activityViewModel: ActivityViewModel,
-    activityToEdit: ActivityResponse? = null
+    activityToEdit: Activity? = null
 ) {
-    var startTime by remember { mutableStateOf(activityToEdit?.beginAt?.formatToHHmm() ?: "00:00") }
-    var endTime by remember { mutableStateOf(activityToEdit?.endAt?.formatToHHmm() ?: "00:00") }
-    var selectedDays by remember { mutableStateOf(activityToEdit?.activeDays?.let { it.toSet().map { d -> when (d) { "SUN" -> "일"; "MON" -> "월"; "TUE" -> "화"; "WED" -> "수"; "THU" -> "목"; "FRI" -> "금"; "SAT" -> "토"; else -> d } }.toSet() } ?: setOf<String>()) }
-    var placeName by remember { mutableStateOf(activityToEdit?.placeName ?: "") }
-    var courtName by remember { mutableStateOf(activityToEdit?.courtName ?: "") }
+    var startTime by remember { mutableStateOf(activityToEdit?.startTime ?: "00:00") }
+    var endTime by remember { mutableStateOf(activityToEdit?.endTime ?: "00:00") }
+    var selectedDays by remember {
+        mutableStateOf(activityToEdit?.selectedDays?.toSet() ?: setOf<String>())
+    }
+    var placeName by remember { mutableStateOf(activityToEdit?.location ?: "") }
+    var courtName by remember { mutableStateOf(activityToEdit?.court ?: "") }
     var address by remember { mutableStateOf(activityToEdit?.address ?: "") }
-    var isRepeating by remember { mutableStateOf(activityToEdit?.isRecurring ?: true) }
-    var selectedCourtType by remember { mutableStateOf(activityToEdit?.let { apiCourtType ->
-        when(apiCourtType.courtType) {
-            "BEGINNER" -> "초보코트"
-            "RALLY" -> "랠리코트"
-            "STUDY", "GAME_STUDY" -> "게임스터디"
-            "CHALLENGE" -> "게임도전"
-            "GAME" -> "게임"
-            else -> ""
-        }
-    } ?: "") }
-    var showStartTimePicker by remember { mutableStateOf(false) }
-    var showEndTimePicker by remember { mutableStateOf(false) }
-
+    var isRepeating by remember { mutableStateOf(activityToEdit?.isRepeating ?: true) }
+    var selectedCourtType by remember {
+        mutableStateOf(
+            activityToEdit?.let { activity ->
+                when (activity.courtType) {
+                    "BEGINNER" -> "초보코트"
+                    "RALLY" -> "랠리코트"
+                    "STUDY" -> "게임스터디"
+                    "CHALLENGE" -> "게임도전"
+                    "GAME" -> "게임"
+                    else -> ""
+                }
+            } ?: ""
+        )
+    }
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
 
     val weekDays = listOf("일", "월", "화", "수", "목", "금", "토")
     val courtTypes = listOf("초보코트", "랠리코트", "게임스터디", "게임도전", "게임")
     val navBarHeight = 110.dp
+
+    var showStartTimePicker by remember { mutableStateOf(false) }
+    var showEndTimePicker by remember { mutableStateOf(false) }
 
     // 코트 타입 매핑 (UI 텍스트 -> API 값)
     val courtTypeMapping = mapOf(
@@ -92,6 +98,14 @@ fun ActivityRegistrationScreen(
         "토" to "SAT"
     )
 
+    // 버튼 활성화 여부 체크
+    val isFormValid = startTime != "00:00" && endTime != "00:00" &&
+            selectedDays.isNotEmpty() &&
+            placeName.isNotEmpty() &&
+            courtName.isNotEmpty() &&
+            address.isNotEmpty() &&
+            selectedCourtType.isNotEmpty()
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -104,7 +118,10 @@ fun ActivityRegistrationScreen(
                 .padding(bottom = navBarHeight),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            TabletTopBar(title = "활동 등록", onBack = onNavigateBack)
+            TabletTopBar(
+                title = if (activityToEdit == null) "활동 등록" else "활동 수정",
+                onBack = onNavigateBack
+            )
             Column(
                 modifier = Modifier
                     .weight(1f)
@@ -113,14 +130,6 @@ fun ActivityRegistrationScreen(
                     .padding(horizontal = 40.dp, vertical = 20.dp),
                 verticalArrangement = Arrangement.spacedBy(24.dp)
             ) {
-                // 버튼 활성화 여부 체크
-                val isFormValid = startTime != "00:00" && endTime != "00:00" &&
-                        selectedDays.isNotEmpty() &&
-                        placeName.isNotEmpty() &&
-                        courtName.isNotEmpty() &&
-                        address.isNotEmpty() &&
-                        selectedCourtType.isNotEmpty()
-
                 // 활동 시간 선택 섹션
                 Column(
                     verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -514,24 +523,34 @@ fun ActivityRegistrationScreen(
                     Button(
                         onClick = {
                             scope.launch {
-                                val request = ActivityRegisterRequest(
-                                    beginAt = startTime,
-                                    endAt = endTime,
-                                    activeDays = selectedDays.map { dayMapping[it]!! },
-                                    participantCount = 12, // 기본값으로 12명 설정
-                                    placeName = placeName,
+                                val activity = Activity(
+                                    id = activityToEdit?.id ?: "",
+                                    location = placeName,
+                                    court = courtName,
+                                    startTime = startTime,
+                                    endTime = endTime,
+                                    selectedDays = selectedDays.toList(),
                                     address = address,
-                                    courtType = courtTypeMapping[selectedCourtType]!!,
-                                    isRecurring = isRepeating,
-                                    courtName = courtName
+                                    isRepeating = isRepeating,
+                                    courtType = courtTypeMapping[selectedCourtType] ?: "GAME"
                                 )
-                                val result = activityViewModel.registerActivity(request)
+
+                                val result = if (activityToEdit == null) {
+                                    activityViewModel.registerActivity(activity)
+                                } else {
+                                    activityViewModel.updateActivity(activity)
+                                }
+
                                 if (result) {
-                                    Toast.makeText(context, "활동이 등록되었습니다", Toast.LENGTH_SHORT).show()
-                                    activityViewModel.refreshActivities() // 목록 새로고침
+                                    val message =
+                                        if (activityToEdit == null) "활동이 등록되었습니다" else "활동이 수정되었습니다"
+                                    Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+                                    activityViewModel.refreshActivities()
                                     onNavigateBack()
                                 } else {
-                                    Toast.makeText(context, "활동 등록에 실패했습니다", Toast.LENGTH_SHORT).show()
+                                    val message =
+                                        if (activityToEdit == null) "활동 등록에 실패했습니다" else "활동 수정에 실패했습니다"
+                                    Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
                                 }
                             }
                         },
@@ -548,7 +567,7 @@ fun ActivityRegistrationScreen(
                         // border 파라미터 완전히 제거!
                     ) {
                         Text(
-                            text = "등록 완료",
+                            text = if (activityToEdit == null) "등록 완료" else "수정 완료",
                             fontSize = 22.sp,
                             fontWeight = FontWeight.Bold
                         )
