@@ -21,10 +21,22 @@ import com.luckydut97.tennispark_tablet.ui.components.BottomNavigationBar
 import com.luckydut97.tennispark_tablet.ui.components.MemberInfo
 import com.luckydut97.tennispark_tablet.ui.components.SettingStatSection
 import com.luckydut97.tennispark_tablet.ui.components.StatItem
-import com.luckydut97.tennispark_tablet.ui.components.MemberInfoSection
-import com.luckydut97.tennispark_tablet.ui.components.TabletTopBar
 import com.luckydut97.tennispark_tablet.ui.theme.TennisGreen
 import com.luckydut97.tennispark_tablet.ui.theme.White
+import com.luckydut97.tennispark_tablet.ui.components.MemberInfoSection
+import com.luckydut97.tennispark_tablet.ui.components.TabletTopBar
+import com.luckydut97.tennispark_tablet.ui.viewmodel.AdminViewModel
+import com.luckydut97.tennispark_tablet.data.repository.AdminRepository
+import com.luckydut97.tennispark_tablet.data.network.ApiProvider
+
+// 더미 회원 데이터
+private fun dummyMemberData(): List<MemberInfo> = listOf(
+    MemberInfo("1", "010-1234-1234", "여", "1년 8개월", "1997", "jsoo.kim", "멤버십"),
+    MemberInfo("2", "010-1234-1234", "여", "9개월", "1994", "rmfl_stanley", "게스트"),
+    MemberInfo("3", "010-5678-5678", "남", "2년 3개월", "1992", "tennis_pro", "멤버십"),
+    MemberInfo("4", "010-9999-9999", "남", "6개월", "1999", "beginner_01", "게스트"),
+    MemberInfo("5", "010-1111-2222", "여", "3년 1개월", "1988", "tennis_queen", "멤버십")
+)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -36,7 +48,20 @@ fun SettingScreen(
 ) {
     var showPushDialog by remember { mutableStateOf(false) }
     var memberList by remember { mutableStateOf(dummyMemberData()) }
+
+    // AdminViewModel 사용
+    val adminViewModel = remember { AdminViewModel(AdminRepository(ApiProvider.adminService)) }
+    val monthlyStats by adminViewModel.monthlyStats.collectAsState()
+    val totalStats by adminViewModel.totalStats.collectAsState()
+    val isLoading by adminViewModel.isLoading.collectAsState()
+    val errorMessage by adminViewModel.errorMessage.collectAsState()
+
     val scrollState = rememberScrollState()
+
+    // 실제 API 호출 시도
+    LaunchedEffect(Unit) {
+        adminViewModel.fetchAllStats()
+    }
 
     // 네비게이션바 높이 고려
     val navBarHeight = 110.dp
@@ -44,7 +69,7 @@ fun SettingScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White) // 전체 배경을 흰색으로
+            .background(Color.White), // 전체 배경을 흰색으로
     ) {
         Column(
             modifier = Modifier
@@ -68,24 +93,56 @@ fun SettingScreen(
                 SettingStatSection(
                     title = "이번달 회원 활동",
                     period = "(2025.04.01 ~ 04.30)",
-                    items = listOf(
-                        StatItem("120명", "참여 인원 수"),
-                        StatItem("120명", "누적 포인트"),
-                        StatItem("120명", "최다 포인트 적립자"),
-                        StatItem("120명", "최다 포인트 사용자")
-                    )
+                    items = when {
+                        isLoading -> listOf(
+                            StatItem("연동중...", "참여 인원 수"),
+                            StatItem("연동중...", "누적 포인트"),
+                            StatItem("연동중...", "최다 포인트 적립자"),
+                            StatItem("연동중...", "최다 포인트 사용자")
+                        )
+
+                        monthlyStats != null -> listOf(
+                            StatItem(monthlyStats!!.participantCountDisplay, "참여 인원 수"),
+                            StatItem(monthlyStats!!.totalPointsDisplay, "누적 포인트"),
+                            StatItem(monthlyStats!!.topPointEarner, "최다 포인트 적립자"),
+                            StatItem(monthlyStats!!.topPointSpender, "최다 포인트 사용자")
+                        )
+
+                        else -> listOf(
+                            StatItem("연동 실패", "참여 인원 수"),
+                            StatItem("연동 실패", "누적 포인트"),
+                            StatItem("연동 실패", "최다 포인트 적립자"),
+                            StatItem("연동 실패", "최다 포인트 사용자")
+                        )
+                    }
                 )
                 Spacer(modifier = Modifier.height(70.dp))
 
                 SettingStatSection(
                     title = "회원통계",
                     period = "(2025.04.01 ~ 04.30)",
-                    items = listOf(
-                        StatItem("500명", "총 회원 수"),
-                        StatItem("800회", "총 활동 횟수"),
-                        StatItem("홍길동", "리그 1위 회원"),
-                        StatItem("95점", "리그 1위 점수")
-                    )
+                    items = when {
+                        isLoading -> listOf(
+                            StatItem("연동중...", "총 회원 수"),
+                            StatItem("연동중...", "총 활동 횟수"),
+                            StatItem("연동중...", "리그 1위 회원"),
+                            StatItem("연동중...", "리그 1위 점수")
+                        )
+
+                        totalStats != null -> listOf(
+                            StatItem(totalStats!!.totalMembersDisplay, "총 회원 수"),
+                            StatItem(totalStats!!.totalActivitiesDisplay, "총 활동 횟수"),
+                            StatItem(totalStats!!.topPlayer, "리그 1위 회원"),
+                            StatItem(totalStats!!.topScoreDisplay, "리그 1위 점수")
+                        )
+
+                        else -> listOf(
+                            StatItem("연동 실패", "총 회원 수"),
+                            StatItem("연동 실패", "총 활동 횟수"),
+                            StatItem("연동 실패", "리그 1위 회원"),
+                            StatItem("연동 실패", "리그 1위 점수")
+                        )
+                    }
                 )
                 Spacer(modifier = Modifier.height(70.dp))
 
@@ -203,9 +260,9 @@ private fun AppPushDialog(
                         .height(4.dp)
                         .background(Color(0xFFE0E0E0), RoundedCornerShape(2.dp))
                 )
-                
+
                 Spacer(modifier = Modifier.height(20.dp))
-                
+
                 // 제목
                 Text(
                     text = "앱 푸시",
@@ -216,67 +273,62 @@ private fun AppPushDialog(
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    // 부제목
-                    Text(
-                        text = "공지사항 안내",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = Color(0xFF262626),
-                        modifier = Modifier.fillMaxWidth()
-                    )
+                // 부제목
+                Text(
+                    text = "공지사항 안내",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = Color(0xFF262626),
+                    modifier = Modifier.fillMaxWidth()
+                )
 
-                    // 메시지 입력 필드
-                    Box(
+                // 메시지 입력 필드
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color.Transparent, RoundedCornerShape(12.dp))
+                        .border(
+                            width = 1.dp,
+                            color = Color(0xFFD2D2D2),
+                            shape = RoundedCornerShape(12.dp)
+                        )
+                        .padding(horizontal = 16.dp, vertical = 0.dp)
+                ) {
+                    BasicTextField(
+                        value = pushMessage,
+                        onValueChange = { pushMessage = it },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .background(Color.Transparent, RoundedCornerShape(12.dp))
-                            .border(
-                                width = 1.dp,
-                                color = Color(0xFFD2D2D2),
-                                shape = RoundedCornerShape(12.dp)
-                            )
-                            .padding(horizontal = 16.dp, vertical = 0.dp)
-                    ) {
-                        BasicTextField(
-                            value = pushMessage,
-                            onValueChange = { pushMessage = it },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .heightIn(min = 56.dp)
-                                .align(Alignment.CenterStart),
-                            textStyle = TextStyle(
-                                color = Color(0xFF262626),
-                                fontSize = 22.sp,
-                                fontWeight = FontWeight.Normal,
-                                lineHeight = 30.sp // Pretendard 기본 lineHeight와 유사
-                            ),
-                            maxLines = 10,
-                            singleLine = false,
-                            decorationBox = { innerTextField ->
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .defaultMinSize(minHeight = 56.dp),
-                                    contentAlignment = Alignment.CenterStart
-                                ) {
-                                    if (pushMessage.isEmpty()) {
-                                        Text(
-                                            text = "회원들에게 공지할 내용을 작성해 주세요.",
-                                            color = Color(0xFF787878),
-                                            fontSize = 22.sp,
-                                            fontWeight = FontWeight.Normal,
-                                            // Pretendard 가정
-                                        )
-                                    }
-                                    innerTextField()
+                            .heightIn(min = 56.dp)
+                            .align(Alignment.CenterStart),
+                        textStyle = TextStyle(
+                            color = Color(0xFF262626),
+                            fontSize = 22.sp,
+                            fontWeight = FontWeight.Normal,
+                            lineHeight = 30.sp // Pretendard 기본 lineHeight와 유사
+                        ),
+                        maxLines = 10,
+                        singleLine = false,
+                        decorationBox = { innerTextField ->
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .defaultMinSize(minHeight = 56.dp),
+                                contentAlignment = Alignment.CenterStart
+                            ) {
+                                if (pushMessage.isEmpty()) {
+                                    Text(
+                                        text = "회원들에게 공지할 내용을 작성해 주세요.",
+                                        color = Color(0xFF787878),
+                                        fontSize = 22.sp,
+                                        fontWeight = FontWeight.Normal,
+                                        // Pretendard 가정
+                                    )
                                 }
+                                innerTextField()
                             }
-                        )
-                    }
+                        }
+                    )
                 }
 
                 Spacer(modifier = Modifier.height(24.dp))
@@ -297,19 +349,9 @@ private fun AppPushDialog(
                         text = "등록하기",
                         fontSize = 16.sp,
                         fontWeight = FontWeight.SemiBold,
-
                     )
                 }
             }
         }
     }
 }
-
-// 더미 회원 데이터
-private fun dummyMemberData(): List<MemberInfo> = listOf(
-    MemberInfo("1", "010-1234-1234", "여", "1년 8개월", "1997", "jsoo.kim", "멤버십"),
-    MemberInfo("2", "010-1234-1234", "여", "9개월", "1994", "rmfl_stanley", "게스트"),
-    MemberInfo("3", "010-5678-5678", "남", "2년 3개월", "1992", "tennis_pro", "멤버십"),
-    MemberInfo("4", "010-9999-9999", "남", "6개월", "1999", "beginner_01", "게스트"),
-    MemberInfo("5", "010-1111-2222", "여", "3년 1개월", "1988", "tennis_queen", "멤버십")
-)

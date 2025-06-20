@@ -7,6 +7,8 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import java.util.concurrent.TimeUnit
 import com.luckydut97.tennispark_tablet.data.network.activity.ActivityApiService
+import com.luckydut97.tennispark_tablet.data.network.event.EventApiService
+import com.luckydut97.tennispark_tablet.data.network.admin.AdminApiService
 
 object ApiProvider {
     private val loggingInterceptor = HttpLoggingInterceptor { message ->
@@ -16,9 +18,9 @@ object ApiProvider {
     }
 
     private val okHttpClient = OkHttpClient.Builder()
-        .connectTimeout(30, TimeUnit.SECONDS)  // 연결 타임아웃
-        .readTimeout(30, TimeUnit.SECONDS)     // 읽기 타임아웃
-        .writeTimeout(30, TimeUnit.SECONDS)    // 쓰기 타임아웃
+        .connectTimeout(30, TimeUnit.SECONDS)
+        .readTimeout(30, TimeUnit.SECONDS)
+        .writeTimeout(30, TimeUnit.SECONDS)
         .addInterceptor(loggingInterceptor)
         .build()
 
@@ -28,19 +30,28 @@ object ApiProvider {
 
     val activityService: ActivityApiService by lazy {
         Retrofit.Builder()
-            .baseUrl(Constants.BASE_URL) // "https://tennis-park.store/"
+            .baseUrl(Constants.BASE_URL)
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(ActivityApiService::class.java)
     }
 
-    val eventService: com.luckydut97.tennispark_tablet.data.network.event.EventApiService by lazy {
+    val eventService: EventApiService by lazy {
         Retrofit.Builder()
             .baseUrl(Constants.BASE_URL)
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
-            .create(com.luckydut97.tennispark_tablet.data.network.event.EventApiService::class.java)
+            .create(EventApiService::class.java)
+    }
+
+    val adminService: AdminApiService by lazy {
+        Retrofit.Builder()
+            .baseUrl(Constants.BASE_URL)
+            .client(okHttpClient)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(AdminApiService::class.java)
     }
 }
